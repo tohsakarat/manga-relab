@@ -1,0 +1,21 @@
+{
+  "name": "manga-relab",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build:pipelines": "node scripts/build-pipelines.mjs",
+    "build": "node scripts/build.mjs",
+    "watch": "node scripts/watch.mjs",
+    "dev": "node scripts/dev.mjs"
+  },
+  "engines": {
+    "node": ">=20.19.0"
+  },
+  "devDependencies": {
+    "chokidar": "5.0.0",
+    "esbuild": "0.28.2",
+    "parse5": "8.0.1",
+    "sirv": "3.0.2",
+    "terser": "5.51.2"
+  }
+}

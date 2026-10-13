@@ -1,0 +1,9 @@
+node_modules/
+dist/
+
+# Local Cloudflare state and credentials stay outside the repository.
+.wrangler/
+.env
+.env.*
+.dev.vars
+.dev.vars.*
