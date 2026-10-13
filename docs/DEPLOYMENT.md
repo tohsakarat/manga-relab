@@ -8,10 +8,11 @@
 - 生产分支：`main`
 - 发布目录：`dist/`
 - 默认地址：`https://manga-relab.pages.dev/`，首次部署后可访问。
-- 自定义域名：待项目负责人确认 `manga-relab` 所属的根域名。
+- 自定义域名：`manga-relab.tohsakarat.icu`，已关联到 Pages，等待 DNS 和证书验证。
+- DNS 区域：`tohsakarat.icu`（`2aab827f9d99ace421dd714b689ed42f`）。
 - GitHub 远程仓库：待项目负责人确认公开或私有后创建。
 
-2026-10-14 已创建空的 Pages 项目，完成本地发布构建，尚未部署。该项目没有连接 Git 自动部署；Git 推送与 Pages 上传是两个独立操作。
+2026-10-14 已创建空的 Pages 项目，完成本地发布构建并关联自定义域名，尚未部署。该项目没有连接 Git 自动部署；Git 推送与 Pages 上传是两个独立操作。
 
 ## 授权
 
@@ -21,9 +22,15 @@
 npx --yes wrangler@4.150.0 login
 ```
 
-现有授权支持 Pages 管理和域名读取，不包含 DNS 修改权限。DNS 准备需要所选域名的临时 DNS 编辑授权，或由项目负责人在 Cloudflare 控制台添加记录。
+现有授权支持 Pages 管理和域名读取，DNS API 已拒绝该授权的访问。DNS 准备需要仅限 `tohsakarat.icu` 的临时 `Zone / DNS / Edit` API Token，或由项目负责人在 Cloudflare 控制台添加记录。令牌需设置到期时间，且不进入仓库或发布产物。
 
-自定义域名需要先关联到 Pages 项目，再将 `manga-relab` 的 CNAME 指向 `manga-relab.pages.dev`。仅添加 CNAME 不足以完成 Pages 域名配置。
+Pages 域名关联已完成。待获得 DNS 编辑授权后，先检查同名记录，再添加以下记录；已有不同目标的记录需由项目负责人确认后才能修改。
+
+| 类型 | 名称 | 目标 |
+| --- | --- | --- |
+| CNAME | `manga-relab` | `manga-relab.pages.dev` |
+
+当前尚未确认或创建 DNS 记录。仅添加 CNAME 不足以完成 Pages 域名配置，需要同时保留上述 Pages 域名关联。
 
 ## 正式发布
 
