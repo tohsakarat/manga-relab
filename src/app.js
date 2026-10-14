@@ -1,6 +1,7 @@
 'use strict';
 (() => {
   const app = document.getElementById('app'), navigation = document.getElementById('navigation');
+  document.getElementById('github-link').prepend(UI.icon('Github'));
   function home() {
     Editor.destroy(); navigation.replaceChildren(); app.replaceChildren();
     Home.init(app, editor);
