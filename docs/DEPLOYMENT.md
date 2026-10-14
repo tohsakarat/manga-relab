@@ -7,12 +7,20 @@
 - 发布方式：Direct Upload，手动上传本地构建产物。
 - 生产分支：`main`
 - 发布目录：`dist/`
-- 默认地址：`https://manga-relab.pages.dev/`，首次部署后可访问。
-- 自定义域名：`manga-relab.tohsakarat.icu`，已关联到 Pages 并配置 DNS；域名验证为 `active`，HTTP 验证为 `pending`。
+- 默认地址：`https://manga-relab.pages.dev/`。
+- 自定义域名：`https://manga-relab.tohsakarat.icu`，Pages 状态、域名验证和 HTTP 验证均为 `active`。
 - DNS 区域：`tohsakarat.icu`（`2aab827f9d99ace421dd714b689ed42f`）。
 - GitHub 远程仓库：`https://github.com/tohsakarat/manga-relab`，公有，远程名 `origin`。
 
-2026-10-14 已创建空的 Pages 项目，完成本地发布构建并关联自定义域名，尚未部署。该项目没有连接 Git 自动部署；Git 推送与 Pages 上传是两个独立操作。
+2026-10-14 已完成首次生产部署。该项目没有连接 Git 自动部署；Git 推送与 Pages 上传是两个独立操作。
+
+## 当前部署
+
+- 发布源码提交：`3bab464dd1e4b50451d897219a75f9dba3737ed7`。
+- 部署 ID：`b8b87d8d-d579-4cd7-ad21-4ff728fa3dc3`。
+- 本次部署地址：`https://b8b87d8d.manga-relab.pages.dev`。
+- 部署阶段：`deploy / success`。
+- 先构建，再推送 GitHub，最后上传 `dist/`；部署时工作区没有未提交改动。
 
 ## 授权
 
@@ -46,7 +54,7 @@ git push -u origin main
 
 ## 正式发布
 
-仅在项目负责人明确说“可以部署”后执行以下步骤。构建需要 Node.js 20.19 或更新版本。
+后续部署仍需取得项目负责人的明确部署指令。构建需要 Node.js 20.19 或更新版本。
 
 在项目根目录运行：
 

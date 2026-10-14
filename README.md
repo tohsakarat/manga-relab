@@ -35,7 +35,7 @@
 
 ### 在线使用
 
-打开 <!-- TODO：填写部署地址 --> 即可。
+打开 <https://manga-relab.tohsakarat.icu> 即可。
 
 ### 离线 / 本地运行
 
