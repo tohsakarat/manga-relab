@@ -199,6 +199,13 @@ const Graph = (() => {
     graph.exposedVars.find(v => v.variableId === variableId).defaultValue = structuredClone(value);
     return graph.edges.filter(e => e.from.port === variableId).map(e => e.to.nodeId);
   }
+  function moveVariable(graph, variableId, targetId, after) {
+    const variables = graph.exposedVars;
+    const [variable] = variables.splice(variables.findIndex(v => v.variableId === variableId), 1);
+    // Array order is shared by cards, parameter panels, tasks, and exported definitions.
+    const index = variables.findIndex(v => v.variableId === targetId);
+    variables.splice(index + (after ? 1 : 0), 0, variable);
+  }
   function params(graph, n, values = {}) {
     const result = structuredClone(n.params);
     if (n.type === 'output') result.directory ??= { key: '', name: n.directoryName || '' };
@@ -317,6 +324,6 @@ const Graph = (() => {
   function exportDefinition(pipeline) {
     UI.download(new Blob([JSON.stringify({ format: 'screenlab-pipeline', version: 1, name: pipeline.name, graph: pipeline.graph }, null, 2)], { type: 'application/json' }), `${pipeline.name}.json`);
   }
-  return { types, create, node, specs, scriptSource, requiresGPU, inputs, multipleImages, geometry, imageEdges, moveImageLayer, imageSizes, port, compatible, connect, expose, setParam, setVariable, params, updateScript, outputSettings,
+  return { types, create, node, specs, scriptSource, requiresGPU, inputs, multipleImages, geometry, imageEdges, moveImageLayer, imageSizes, port, compatible, connect, expose, setParam, setVariable, moveVariable, params, updateScript, outputSettings,
     removeEdge, removeNodes, descendants, ancestors, order, validate, filterId, imageSize, importDefinition, exportDefinition };
 })();

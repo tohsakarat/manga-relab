@@ -115,12 +115,12 @@
   --accent-glow: rgba(76, 154, 255, 0.25);
 }
 :root[data-theme="light"][data-accent="blue"] {
-  --accent: #2563eb;
-  --accent-hover: #1d4ed8;
+  --accent: #526fa5;
+  --accent-hover: #435d8d;
   --accent-contrast: #ffffff;
-  --accent-soft: rgba(37, 99, 235, 0.11);
-  --accent-border: rgba(37, 99, 235, 0.4);
-  --accent-glow: rgba(37, 99, 235, 0.2);
+  --accent-soft: rgba(82, 111, 165, 0.11);
+  --accent-border: rgba(82, 111, 165, 0.4);
+  --accent-glow: rgba(82, 111, 165, 0.2);
 }
 
 :root[data-accent="pink"] {
@@ -132,12 +132,12 @@
   --accent-glow: rgba(244, 114, 182, 0.25);
 }
 :root[data-theme="light"][data-accent="pink"] {
-  --accent: #db2777;
-  --accent-hover: #be185d;
+  --accent: #a85d7e;
+  --accent-hover: #914e6b;
   --accent-contrast: #ffffff;
-  --accent-soft: rgba(219, 39, 119, 0.1);
-  --accent-border: rgba(219, 39, 119, 0.38);
-  --accent-glow: rgba(219, 39, 119, 0.2);
+  --accent-soft: rgba(168, 93, 126, 0.1);
+  --accent-border: rgba(168, 93, 126, 0.38);
+  --accent-glow: rgba(168, 93, 126, 0.2);
 }
 
 :root[data-accent="green"] {
@@ -149,12 +149,12 @@
   --accent-glow: rgba(52, 211, 153, 0.25);
 }
 :root[data-theme="light"][data-accent="green"] {
-  --accent: #059669;
-  --accent-hover: #047857;
+  --accent: #43836e;
+  --accent-hover: #366e5c;
   --accent-contrast: #ffffff;
-  --accent-soft: rgba(5, 150, 105, 0.11);
-  --accent-border: rgba(5, 150, 105, 0.38);
-  --accent-glow: rgba(5, 150, 105, 0.2);
+  --accent-soft: rgba(67, 131, 110, 0.11);
+  --accent-border: rgba(67, 131, 110, 0.38);
+  --accent-glow: rgba(67, 131, 110, 0.2);
 }
 
 /* Base Reset & Typography */
@@ -323,19 +323,6 @@ button svg {
   gap: 11px;
   white-space: nowrap;
 }
-.brand-mark {
-  display: grid;
-  place-items: center;
-  width: 32px;
-  height: 32px;
-  background: var(--accent-soft);
-  border: 1px solid var(--accent-border);
-  color: var(--accent);
-  border-radius: 9px;
-  font-size: 15px;
-  font-weight: 700;
-  box-shadow: 0 2px 8px var(--accent-glow);
-}
 .brand strong {
   font-size: 15px;
   font-weight: 650;
@@ -365,10 +352,28 @@ button svg {
   align-items: center;
   gap: 10px;
 }
+.gpu-info {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--muted);
+  font-size: 10px;
+  letter-spacing: 0;
+}
+.gpu-info:hover {
+  color: var(--text);
+  text-decoration: underline;
+}
 .repository-link {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  justify-content: center;
+  width: 32px;
   min-height: 32px;
   color: var(--muted);
   font-size: 12px;
@@ -384,6 +389,7 @@ button svg {
 .accent-switcher {
   display: inline-flex;
   align-items: center;
+  height: 32px;
   gap: 6px;
   padding: 4px 7px;
   background: var(--bg-subtle);
@@ -418,6 +424,7 @@ button svg {
   transform: scale(1.1);
 }
 .theme-toggle {
+  height: 32px;
   min-height: 32px;
   padding: 4px 10px;
   font-size: 12px;
@@ -1014,6 +1021,13 @@ button svg {
 }
 .ports {
   padding: 8px 12px;
+}
+.output-size {
+  flex-shrink: 0;
+  font-size: 11.5px;
+  font-weight: 400;
+  color: var(--text-secondary);
+  white-space: nowrap;
 }
 .port-row {
   position: relative;
@@ -1769,6 +1783,38 @@ button svg {
   font-size: 12px;
   margin-bottom: 6px;
 }
+.variable-sort-handle {
+  display: inline-flex;
+  flex: 0 0 16px;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 24px;
+  color: var(--muted);
+  cursor: grab;
+}
+.variable-sort-handle svg {
+  width: 14px;
+  height: 14px;
+  pointer-events: none;
+}
+.variable-sort-row {
+  cursor: grab;
+}
+.variable-sort-row:active,
+.variable-sort-handle:active {
+  cursor: grabbing;
+}
+.variable-drop-before {
+  box-shadow: 0 -2px 0 var(--accent);
+}
+.variable-drop-after {
+  box-shadow: 0 2px 0 var(--accent);
+}
+.variable-heading > input {
+  flex: 1;
+  min-width: 0;
+}
 .preset-button {
   width: 100%;
   justify-content: center;
@@ -2010,19 +2056,11 @@ button svg {
 }
 
 @media (max-width: 760px) {
-  .repository-link span {
-    display: none;
-  }
-  .repository-link {
-    width: 32px;
-    justify-content: center;
+  .gpu-info {
+    max-width: 90px;
   }
   .brand strong {
     font-size: 13px;
-  }
-  .brand-mark {
-    width: 26px;
-    height: 26px;
   }
   .app-bar {
     gap: 10px;

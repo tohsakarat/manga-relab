@@ -1,4 +1,4 @@
-/* Output-only color conversion and encoding; processing images remain RGBA. */
+/* Color conversion and encoding for saved files and size estimates; images remain RGBA. */
 'use strict';
 const OutputFormat = (() => {
   const formats = {
@@ -46,5 +46,11 @@ const OutputFormat = (() => {
     if (!result || result.type !== type) throw new Error(`浏览器无法编码 ${type}`);
     return result;
   }
-  return { format, encode };
+  async function estimateSize(image, node, type) {
+    const blob = await encode(image, node, type);
+    // The preview contains original pixels, so extrapolate encoded bytes by area.
+    const fullArea = (image.fullWidth ?? image.width) * (image.fullHeight ?? image.height);
+    return Math.round(blob.size * fullArea / (image.width * image.height));
+  }
+  return { format, encode, estimateSize };
 })();

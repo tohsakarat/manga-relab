@@ -6,6 +6,8 @@ const Editor = (() => {
     destroy();
     const graph = pipeline.graph, selected = new Set();
     const events = new AbortController(), nodeElements = new Map(), nodePreviews = new Map();
+    const outputEstimates = new Map();
+    let previewFileType = '';
     let gesture = null, draft = null, popup = null, popupNode = null, popupViews = [], scriptEditor = null, space = false;
     let previewTimer = null, previewRun = null, trialRun = null, previewSourceVersion = 0;
     // The panel and canvas use different crops; switching views must keep both caches.
@@ -51,7 +53,7 @@ const Editor = (() => {
       function section(title) { const s = UI.el('section', 'sidebar-section'); s.append(UI.el('h3', 'sidebar-title', title)); sidebar.append(s); return s; }
       const navigation = section('画布'), canvasZoom = UI.el('input'); canvasZoom.type = 'number'; canvasZoom.min = 25; canvasZoom.max = 400; canvasZoom.step = 1; canvasZoom.value = view.zoom * 100; canvasZoom.setAttribute('aria-label', '画布缩放百分比');
       canvasZoom.onchange = () => { if (canvasZoom.reportValidity()) zoomTo(canvasZoom.valueAsNumber / 100); };
-      const control = UI.el('div', 'zoom-control'); control.append(canvasZoom, UI.el('span', '', '%'), UI.button('Maximize', '适应画布', fit), UI.button('Scan', '画布 100%', () => zoomTo(1))); navigation.append(control);
+      const control = UI.el('div', 'zoom-control'); control.append(canvasZoom, UI.el('span', '', '%'), UI.button('Shrink', '适应画布', fit), UI.button('Focus', '画布 100%', () => zoomTo(1))); navigation.append(control);
       const info = section('流水线'), infoRow = UI.el('div', 'pipeline-status-row'), validationLabel = UI.el('div', 'editor-status'), stats = UI.el('div', 'editor-stat');
       infoRow.append(validationLabel, stats); info.append(infoRow);
       const image = section('预览图片'), sourceName = UI.el('div', 'preview-source', previewState.name ? `${previewState.name} · 恢复中` : '未选择');
@@ -118,7 +120,7 @@ const Editor = (() => {
       viewportSection.append(sidebarSurface);
       const previewZoom = UI.el('input'); previewZoom.type = 'number'; previewZoom.min = 5; previewZoom.max = 3200; previewZoom.step = 1; previewZoom.value = previewState.zoom * 100; previewZoom.setAttribute('aria-label', '图片缩放百分比');
       previewZoom.onchange = () => { if (previewZoom.reportValidity()) preview.zoomTo(previewZoom.valueAsNumber / 100); };
-      const zoomControl = UI.el('div', 'zoom-control'); zoomControl.append(previewZoom, UI.el('span', '', '%'), UI.button('Maximize', '图片适应视窗', () => preview.fit()), UI.button('Scan', '图片 100%', () => preview.zoomTo(1)));
+      const zoomControl = UI.el('div', 'zoom-control'); zoomControl.append(previewZoom, UI.el('span', '', '%'), UI.button('Shrink', '图片适应视窗', () => preview.fit()), UI.button('Focus', '图片 100%', () => preview.zoomTo(1)));
       viewportSection.append(zoomControl, previewStatus);
       enabled.onchange = () => {
         EditorState.update(pipeline.id, { enabled: enabled.checked }); imageChoices.hidden = !enabled.checked;
@@ -131,7 +133,8 @@ const Editor = (() => {
       const image = await Assets.decode(file); if (events.signal.aborted || version !== previewSourceVersion) return;
       if (persist) await EditorState.setFile(pipeline.id, file);
       if (events.signal.aborted || version !== previewSourceVersion) return;
-      Assets.previews.set(pipeline.id, { image, name: file.name });
+      previewFileType = file.type;
+      Assets.previews.set(pipeline.id, { image, name: file.name, type: file.type });
       EditorState.update(pipeline.id, { name: file.name, ...selection });
       sourceName.textContent = `${file.name} · ${image.width} × ${image.height}`;
       preview.load(image, previewState); updateTrialButton();
@@ -271,10 +274,46 @@ const Editor = (() => {
           n.outputSettings = { ...Graph.outputSettings(n), quality: value }; save();
           // Keep the card and floating panel in sync without replacing a slider mid-drag.
           for (const control of document.querySelectorAll(`[data-output-quality="${CSS.escape(n.id)}"] input`)) control.value = value;
+          paintOutputEstimate(n.id);
         }, { sliders: true });
         quality.dataset.outputQuality = n.id;
         host.append(UI.label('质量（%）', quality));
       }
+    }
+    function paintOutputEstimate(id) {
+      const node = graph.nodes[id];
+      if (node?.type !== 'output') return;
+      const label = nodeElements.get(id)?.querySelector('.output-size');
+      if (!label) return;
+      const context = previewContext();
+      const image = (context.image === preview.image ? context.cache.get(id) : null)
+        || (canvasPreview.image === preview.image ? canvasPreview.cache.get(id) : null);
+      if (!image) {
+        outputEstimates.delete(id);
+        label.textContent = `预估大小：${preview.image ? '等待预览' : '未选择图片'}`;
+        label.title = '获得输出预览后估算文件大小';
+        return;
+      }
+      const type = node.outputMode === 'overwrite' ? previewFileType : OutputFormat.format(node).type;
+      const key = JSON.stringify([node.outputMode, Graph.outputSettings(node), type]);
+      let estimate = outputEstimates.get(id);
+      if (estimate?.image !== image || estimate.key !== key) {
+        estimate = { image, key, text: '预估大小：估算中' };
+        outputEstimates.set(id, estimate);
+        const snapshot = structuredClone(node);
+        OutputFormat.estimateSize(image, snapshot, type).then(bytes => {
+          const unit = bytes >= 1048576 ? 'MB' : 'KB', divisor = unit === 'MB' ? 1048576 : 1024;
+          estimate.text = `预估大小：约 ${(bytes / divisor).toFixed(1)} ${unit}`;
+        }).catch(error => {
+          estimate.text = '预估大小：无法估算';
+          estimate.error = error.message;
+        }).finally(() => {
+          // Encoding is asynchronous; an older crop or setting must not replace the current estimate.
+          if (!events.signal.aborted && outputEstimates.get(id) === estimate) paintOutputEstimate(id);
+        });
+      }
+      label.textContent = estimate.text;
+      label.title = estimate.error || '按当前输出预览的编码大小与整图像素面积估算，实际文件大小可能不同';
     }
     function exposeParameter(n, key) {
       if (n.type === 'output' && key === 'directory' && !n.params.directory?.key && !graph.edges.some(e => e.to.nodeId === n.id && e.to.port === key)) {
@@ -326,9 +365,51 @@ const Editor = (() => {
       list.append(empty);
       host.append(list);
     }
+    function variableSortHandle(n, variable, row, wholeRow = false) {
+      const format = 'application/x-screenlab-variable';
+      const handle = UI.el('span', 'variable-sort-handle'); handle.append(UI.icon('GripVertical'));
+      handle.title = '拖动调整入参顺序'; handle.setAttribute('aria-label', handle.title);
+      const source = wholeRow ? row : handle; source.draggable = true;
+      // Canvas rows open their popup on click so pointerdown can begin a native drag.
+      source.onpointerdown = event => event.stopPropagation();
+      if (wholeRow) {
+        row.classList.add('variable-sort-row'); row.title = handle.title;
+        row.onclick = event => {
+          if (event.target.closest('button,input,select,textarea')) return;
+          event.stopPropagation(); selectNode(n.id, event.ctrlKey || event.metaKey); openPanel(n);
+        };
+      }
+      source.ondragstart = event => {
+        if (event.target.closest('button,input,select,textarea')) { event.preventDefault(); return; }
+        event.stopPropagation(); event.dataTransfer.setData(format, variable.variableId); event.dataTransfer.effectAllowed = 'move';
+      };
+      const clear = () => row.classList.remove('variable-drop-before', 'variable-drop-after');
+      const after = event => { const rect = row.getBoundingClientRect(); return event.clientY > rect.top + rect.height / 2; };
+      row.ondragover = event => {
+        if (!event.dataTransfer.types.includes(format)) return;
+        event.preventDefault(); event.stopPropagation(); event.dataTransfer.dropEffect = 'move';
+        row.classList.toggle('variable-drop-before', !after(event)); row.classList.toggle('variable-drop-after', after(event));
+      };
+      row.ondragleave = event => { if (!row.contains(event.relatedTarget)) clear(); };
+      source.ondragend = () => {
+        for (const target of row.parentElement.querySelectorAll('.variable-drop-before,.variable-drop-after')) target.classList.remove('variable-drop-before', 'variable-drop-after');
+      };
+      row.ondrop = event => {
+        const id = event.dataTransfer.getData(format); clear();
+        if (!id) return;
+        event.preventDefault(); event.stopPropagation();
+        if (id === variable.variableId) return;
+        Graph.moveVariable(graph, id, variable.variableId, after(event));
+        // Presentation order does not invalidate image results.
+        save(); render();
+        if (popupNode === n.id) { const host = popup.querySelector('.popup-parameters'); host.replaceChildren(); inputPanel(n, host); }
+      };
+      return handle;
+    }
     function nodeCard(n) {
       const card = UI.el('article', `node node-${n.type}${selected.has(n.id) ? ' selected' : ''}`); card.dataset.node = n.id; card.style.left = `${n.x}px`; card.style.top = `${n.y}px`; card.style.setProperty('--node-color', Graph.types[n.type].color);
       const title = UI.el('header', 'node-title'); title.append(UI.icon(Graph.types[n.type].icon), UI.el('span', '', n.name));
+      if (n.type === 'output') title.append(UI.el('small', 'output-size', '预估大小：等待预览'));
       if (n.type === 'denoise' || Graph.requiresGPU(n)) title.append(UI.el('small', `device${Graph.requiresGPU(n) && !navigator.gpu ? ' danger' : ''}`, n.type === 'denoise' && !navigator.gpu ? 'CPU' : !navigator.gpu ? '需要 WebGPU' : 'GPU'));
       title.onpointerdown = event => startNodeMove(event, n);
       card.append(title); const ports = UI.el('div', 'ports');
@@ -339,6 +420,7 @@ const Editor = (() => {
       if (n.type === 'input') {
         for (const v of graph.exposedVars) {
           const row = portRow(n, 'out', v.variableId, v.displayName, v.spec.type, v.defaultValue);
+          row.prepend(variableSortHandle(n, v, row, true));
           row.querySelector('.port-label').ondblclick = event => { event.stopPropagation(); UI.rename(row.querySelector('.port-label'), v.displayName, value => { v.displayName = value; edited(); }); };
           ports.append(row);
         }
@@ -609,6 +691,7 @@ const Editor = (() => {
       host.append(UI.el('p', 'muted', '图片集资产输入'));
       for (const v of graph.exposedVars) {
         const block = UI.el('div', 'input-variable'), header = UI.el('div', 'variable-heading'), name = UI.el('input'); name.value = v.displayName; name.setAttribute('aria-label', '变量名称');
+        header.append(variableSortHandle(n, v, block));
         name.onchange = () => { if (name.value.trim()) { v.displayName = name.value.trim(); edited(); } };
         header.append(name, UI.button('Trash2', '删除输入变量', () => {
           const affected = graph.edges.filter(e => e.from.port === v.variableId).map(e => e.to.nodeId);
@@ -708,6 +791,7 @@ const Editor = (() => {
       }
     }
     function paintNodePreview(id) {
+      paintOutputEstimate(id);
       if (popupNode) return;
       const entry = nodePreviews.get(id); if (!entry) return;
       const { element: host, handle } = entry;
@@ -758,6 +842,7 @@ const Editor = (() => {
     if (!graph.view) requestAnimationFrame(() => { if (!events.signal.aborted) fit(); });
     const source = Assets.previews.get(pipeline.id);
     if (source) {
+      previewFileType = source.type;
       sourceName.textContent = `${source.name} · ${source.image.width} × ${source.image.height}`;
       preview.load(source.image, previewState); updateTrialButton();
     } else {

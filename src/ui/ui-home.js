@@ -183,7 +183,11 @@ const Home = (() => {
     if (!host) return;
     const home = UI.el('div', 'home');
     const sets = column('图片集', 'Images', Store.imageSets.all(), [UI.button('Plus', '新建图片集', () => newRecord(Store.imageSets, '未命名图片集', () => { const set = Store.imageSets.create('未命名图片集'); expandedSet = set.id; return set; }))]);
-    const pipes = column('流水线', 'Workflow', Store.pipelines.all(), [UI.button('Upload', '导入流水线', importPipeline), UI.button('Plus', '新建流水线', () => newRecord(Store.pipelines, '未命名流水线', () => Store.pipelines.create('未命名流水线', Graph.create())))]);
+    const exportPipelines = UI.button('Download', '批量导出流水线', () => {
+      for (const pipeline of Object.values(Store.pipelines.all())) Graph.exportDefinition(pipeline);
+    });
+    exportPipelines.disabled = !Object.keys(Store.pipelines.all()).length;
+    const pipes = column('流水线', 'Workflow', Store.pipelines.all(), [exportPipelines, UI.button('Upload', '导入流水线', importPipeline), UI.button('Plus', '新建流水线', () => newRecord(Store.pipelines, '未命名流水线', () => Store.pipelines.create('未命名流水线', Graph.create())))]);
     const sequence = UI.button('ListVideo', '按列表顺序执行未完成任务', () => Tasks.startSequence(), Tasks.isSequencing() ? '执行中' : '顺序执行');
     sequence.dataset.taskSequence = ''; sequence.dataset.sequencing = String(Tasks.isSequencing());
     sequence.disabled = !Tasks.canStartSequence(); sequence.classList.add('primary');

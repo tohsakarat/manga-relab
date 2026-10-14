@@ -6,7 +6,7 @@
     "build:pipelines": "node scripts/build-pipelines.mjs",
     "build": "node scripts/build.mjs",
     "watch": "node scripts/watch.mjs",
-    "dev": "node scripts/dev.mjs"
+    "dev": "node scripts/watch.mjs"
   },
   "engines": {
     "node": ">=20.19.0"
