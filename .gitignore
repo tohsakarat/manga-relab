@@ -1,5 +1,6 @@
 node_modules/
 dist/
+.git/
 
 # Local Cloudflare state and credentials stay outside the repository.
 .wrangler/

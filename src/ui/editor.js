@@ -55,7 +55,8 @@ const Editor = (() => {
       const info = section('流水线'), infoRow = UI.el('div', 'pipeline-status-row'), validationLabel = UI.el('div', 'editor-status'), stats = UI.el('div', 'editor-stat');
       infoRow.append(validationLabel, stats); info.append(infoRow);
       const image = section('预览图片'), sourceName = UI.el('div', 'preview-source', previewState.name ? `${previewState.name} · 恢复中` : '未选择');
-      image.append(UI.button('ImagePlus', '选择预览图片', async () => {
+      const imageChoices = UI.el('div', 'preview-source-picker'); imageChoices.hidden = !previewState.enabled;
+      imageChoices.append(UI.button('ImagePlus', '选择预览图片', async () => {
         const [file] = await UI.pickFiles({ accept: 'image/*' }); if (!file) return;
         await loadPreview(file, { imageSetId: '', fileId: '' });
         chooseSet.value = ''; updateFileSelect('');
@@ -66,6 +67,22 @@ const Editor = (() => {
       });
       const fileSelect = UI.select([], '',
         async id => { if (id) await loadPreview(await Assets.read(id), { imageSetId: chooseSet.value, fileId: id }); });
+      let authorizing = false;
+      const authorizeButton = UI.button('FolderOpen', '', async () => {
+        const set = Store.imageSets.get(chooseSet.value);
+        authorizing = true; updateFileSelect(set.id, fileSelect.value);
+        try {
+          const { authorized, changed } = await Assets.reconnect(set);
+          if (changed) for (const task of Store.tasksUsing('imageSetId', set.id)) {
+            if (!Tasks.isRunning(task.id)) Store.resetTask(task.id);
+          }
+          UI.toast(`已授权 ${authorized} / ${set.files.length} 张图片`);
+        } finally {
+          authorizing = false;
+          if (!events.signal.aborted) updateFileSelect(chooseSet.value, fileSelect.value);
+        }
+      }, '选择图片');
+      const fileChoice = UI.el('div', 'preview-file-choice'); fileChoice.append(fileSelect, authorizeButton);
       function updateFileSelect(setId, fileId = '') {
         const files = Store.imageSets.get(setId)?.files || [];
         fileSelect.replaceChildren(new Option('选择图片', ''));
@@ -76,16 +93,23 @@ const Editor = (() => {
           fileSelect.add(option);
         }
         fileSelect.value = fileId;
-        fileSelect.disabled = !files.some(file => Assets.authorized(file.id));
-        fileSelect.title = !setId ? '请先选择图片集' : fileSelect.disabled ? '没有已授权的图片，请在首页重新授权图片集' : '';
+        const locked = !files.some(file => Assets.authorized(file.id));
+        const busy = Store.tasksUsing('imageSetId', setId).some(task => Tasks.isRunning(task.id));
+        fileSelect.hidden = locked; authorizeButton.hidden = !locked;
+        authorizeButton.disabled = !setId || authorizing || busy;
+        fileChoice.title = !setId ? '请先选择图片集' : authorizing ? '正在授权图片集' : locked
+          ? busy ? '任务正在使用此图片集，完成后可重新授权' : '图片集尚无已授权图片，点击选择目录授权后即可选图'
+          : '';
+        authorizeButton.title = fileChoice.title;
+        authorizeButton.setAttribute('aria-label', fileChoice.title || '选择图片');
       }
       updateFileSelect(previewState.imageSetId, previewState.fileId);
-      const selectRow = UI.el('div', 'preview-select-row'); selectRow.append(chooseSet, fileSelect);
+      const selectRow = UI.el('div', 'preview-select-row'); selectRow.append(chooseSet, fileChoice);
       const sourceRow = UI.el('div', 'preview-meta-row');
       const check = UI.el('label', 'check-row'), enabled = UI.el('input'); enabled.type = 'checkbox'; enabled.checked = previewState.enabled;
       check.append(enabled, document.createTextNode('编辑器预览'));
-      sourceRow.append(sourceName, check);
-      image.append(selectRow, sourceRow);
+      imageChoices.append(selectRow); sourceRow.append(sourceName);
+      image.append(check, imageChoices, sourceRow);
       const trialButton = UI.button('Play', '整图试跑并下载结果', trial, '试跑'); trialButton.classList.add('primary', 'trial-button');
       const trialProgress = UI.el('progress', 'trial-progress'); trialProgress.max = 100; trialProgress.value = 0; trialProgress.hidden = true; trialProgress.setAttribute('aria-label', '试跑总进度');
       const trialStatus = UI.el('div', 'trial-status'); trialStatus.setAttribute('role', 'status');
@@ -96,7 +120,10 @@ const Editor = (() => {
       previewZoom.onchange = () => { if (previewZoom.reportValidity()) preview.zoomTo(previewZoom.valueAsNumber / 100); };
       const zoomControl = UI.el('div', 'zoom-control'); zoomControl.append(previewZoom, UI.el('span', '', '%'), UI.button('Maximize', '图片适应视窗', () => preview.fit()), UI.button('Scan', '图片 100%', () => preview.zoomTo(1)));
       viewportSection.append(zoomControl, previewStatus);
-      enabled.onchange = () => { EditorState.update(pipeline.id, { enabled: enabled.checked }); render(); schedule(); };
+      enabled.onchange = () => {
+        EditorState.update(pipeline.id, { enabled: enabled.checked }); imageChoices.hidden = !enabled.checked;
+        render(); schedule();
+      };
       return { canvasZoom, previewZoom, previewStatus, sourceName, sidebarSurface, validationLabel, stats, enabled, trialButton, trialProgress, trialStatus };
     }
     async function loadPreview(file, selection, persist = true) {
@@ -110,8 +137,26 @@ const Editor = (() => {
       preview.load(image, previewState); updateTrialButton();
       if (popupNode) openPanel(graph.nodes[popupNode]);
     }
-    // Resume in a new task after the frame so the completed node is visible before more work.
-    function paintFrame() { return new Promise(resolve => requestAnimationFrame(() => setTimeout(resolve, 0))); }
+    // Visible pages paint each result; hidden pages must not wait for animation frames.
+    function paintFrame(signal) {
+      if (document.hidden || signal.aborted) return Promise.resolve();
+      return new Promise(resolve => {
+        const channel = new MessageChannel();
+        // A message task resumes after painting without a background-throttled timer.
+        const frame = requestAnimationFrame(() => channel.port2.postMessage(null));
+        function finish() {
+          cancelAnimationFrame(frame);
+          channel.port1.close(); channel.port2.close();
+          document.removeEventListener('visibilitychange', onVisibility);
+          signal.removeEventListener('abort', finish);
+          resolve();
+        }
+        function onVisibility() { if (document.hidden) finish(); }
+        channel.port1.onmessage = finish;
+        document.addEventListener('visibilitychange', onVisibility);
+        signal.addEventListener('abort', finish, { once: true });
+      });
+    }
     function updateTrialButton() {
       const problem = Graph.validate(graph).errors.join('；');
       trialButton.disabled = !!trialRun || !preview.image || !!problem;
@@ -127,13 +172,13 @@ const Editor = (() => {
       trialProgress.hidden = false; trialProgress.value = 0; trialStatus.textContent = '0%';
       const progress = new Map([...validation.active].map(id => [id, 0]));
       try {
-        await paintFrame();
+        await paintFrame(controller.signal);
         const results = await Engine.execute(snapshot, image, { signal: controller.signal, onProgress: (node, value) => {
           progress.set(node.id, value);
           const percentage = [...progress.values()].reduce((sum, v) => sum + v, 0) / progress.size * 100;
           trialProgress.value = percentage;
           trialStatus.textContent = `${percentage.toFixed(1)}% · ${node.name} ${Math.round(value * 100)}%`;
-        }, onNode: paintFrame });
+        }, onNode: () => paintFrame(controller.signal) });
         const stem = name.replace(/\.[^.]+$/, '');
         const outputs = Object.values(snapshot.nodes).filter(n => n.type === 'output');
         for (const [index, node] of outputs.entries()) {
@@ -637,7 +682,7 @@ const Editor = (() => {
         const callbacks = { onNode: async n => {
           if (controller.signal.aborted) return;
           previewNode = null;
-          paintNodePreview(n.id); paintPopupPreviews(); await paintFrame();
+          paintNodePreview(n.id); paintPopupPreviews(); await paintFrame(controller.signal);
         }, onProgress: (n, value) => {
           if (controller.signal.aborted) return;
           previewNode = n.id; previewProgress = value;

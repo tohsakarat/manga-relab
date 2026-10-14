@@ -12,7 +12,9 @@ ScreenFilters.register(function () {
   // @output Promise<{data: Uint8ClampedArray RGBA, width: integer, height: integer}>
   // ==/ScreenFilter==
   'use strict';
-  const shader = `
+  function buildShader(patch, search) {
+    const samples = (2 * patch + 1) ** 2 - 1;
+    return `
 struct Config {
   width: u32,
   height: u32,
@@ -24,12 +26,23 @@ struct Config {
   count: u32,
   h2: f32,
 }
-override PATCH: i32 = 4;
-override SEARCH: i32 = 12;
+const PATCH: i32 = ${patch};
+const SEARCH: i32 = ${search};
+const PATCH_WIDTH: u32 = ${2 * patch + 1}u;
+const PATCH_SAMPLES: u32 = ${samples}u;
 @group(0) @binding(0) var<storage, read> source: array<u32>;
 @group(0) @binding(1) var<storage, read_write> luma: array<f32>;
 @group(0) @binding(2) var<storage, read_write> output: array<u32>;
 @group(0) @binding(3) var<uniform> config: Config;
+
+// Eight lanes share one reference patch; eight pixels share a 64-lane workgroup.
+// Even at the largest patch, shared storage is 15904 bytes, below the 16 KiB baseline.
+var<workgroup> references: array<f32, ${samples * 8}>;
+var<workgroup> invalidReference: array<u32, 64>;
+var<workgroup> enabled: array<u32, 8>;
+var<workgroup> laneCounts: array<u32, 64>;
+var<workgroup> laneDistances: array<f32, 768>;
+var<workgroup> laneIndices: array<u32, 768>;
 
 fn rgb(pixel: u32) -> vec3<f32> {
   return vec3<f32>(f32(pixel & 255u), f32((pixel >> 8u) & 255u),
@@ -57,62 +70,81 @@ fn prepare(@builtin(global_invocation_id) id: vec3<u32>) {
   luma[index] = color.r * 0.2126 + color.g * 0.7152 + color.b * 0.0722;
 }
 
+fn patchOffset(sample: u32) -> vec2<i32> {
+  // Preserve row-major sample order while omitting the center pixel.
+  let index = sample + select(0u, 1u, sample >= PATCH_SAMPLES / 2u);
+  return vec2<i32>(i32(index % PATCH_WIDTH) - PATCH, i32(index / PATCH_WIDTH) - PATCH);
+}
+
+fn matchDistance(cx: i32, cy: i32, referenceBase: u32, cutoff: f32) -> f32 {
+  if ((source[sampleIndex(cx, cy)] >> 24u) != 255u) { return -1.0; }
+  var sum = 0.0;
+  for (var k = 0u; k < PATCH_SAMPLES; k++) {
+    let offset = patchOffset(k);
+    let index = sampleIndex(cx + offset.x, cy + offset.y);
+    if ((source[index] >> 24u) != 255u) { return -1.0; }
+    let difference = references[referenceBase + k] - luma[index];
+    sum += min(difference * difference, 10000.0);
+    if (sum > cutoff * f32(PATCH_SAMPLES)) { return -1.0; }
+  }
+  return sum / f32(PATCH_SAMPLES);
+}
+
 @compute @workgroup_size(64)
-fn repair(@builtin(global_invocation_id) id: vec3<u32>) {
-  if (id.x >= config.count) { return; }
-  let destination = config.start + id.x;
+fn repair(@builtin(workgroup_id) group: vec3<u32>, @builtin(local_invocation_index) local: u32) {
+  let pixelSlot = local / 8u;
+  let lane = local % 8u;
+  let batchPixel = group.x * 8u + pixelSlot;
+  let destination = config.start + batchPixel;
   let x = i32(config.roiX + destination % config.roiWidth);
   let y = i32(config.roiY + destination / config.roiWidth);
   let center = sampleIndex(x, y);
   let pixel = source[center];
-  output[destination] = pixel;
-  if ((pixel >> 24u) != 255u) { return; }
-
-  var reference: array<f32, 288>;
-  var samples = 0u;
-  for (var dy = -PATCH; dy <= PATCH; dy++) {
-    for (var dx = -PATCH; dx <= PATCH; dx++) {
-      if (dx == 0 && dy == 0) { continue; }
-      let index = sampleIndex(x + dx, y + dy);
-      if ((source[index] >> 24u) != 255u) { return; }
-      reference[samples] = luma[index];
-      samples++;
+  let pixelEnabled = batchPixel < config.count && (pixel >> 24u) == 255u;
+  let referenceBase = pixelSlot * PATCH_SAMPLES;
+  var invalid = 0u;
+  if (lane == 0u && batchPixel < config.count) { output[destination] = pixel; }
+  if (pixelEnabled) {
+    for (var k = lane; k < PATCH_SAMPLES; k += 8u) {
+      let offset = patchOffset(k);
+      let index = sampleIndex(x + offset.x, y + offset.y);
+      references[referenceBase + k] = luma[index];
+      if ((source[index] >> 24u) != 255u) { invalid = 1u; }
     }
   }
+  invalidReference[local] = invalid;
+  // Inactive tail pixels and transparent pixels must still reach every barrier.
+  workgroupBarrier();
+  if (lane == 0u) {
+    var valid = pixelEnabled;
+    for (var k = 0u; k < 8u; k++) {
+      if (invalidReference[pixelSlot * 8u + k] != 0u) { valid = false; }
+    }
+    enabled[pixelSlot] = select(0u, 1u, valid);
+  }
+  workgroupBarrier();
 
   var distances: array<f32, 12>;
   var indices: array<u32, 12>;
   var count = 0u;
   var cutoff = 6.0 * config.h2;
-  for (var cy = max(0, y - SEARCH); cy <= min(i32(config.height) - 1, y + SEARCH); cy++) {
-    for (var cx = max(0, x - SEARCH); cx <= min(i32(config.width) - 1, x + SEARCH); cx++) {
+  let searchWidth = u32(SEARCH * 2 + 1);
+  if (enabled[pixelSlot] != 0u) {
+    for (var position = lane; position < searchWidth * searchWidth; position += 8u) {
+      let cx = x + i32(position % searchWidth) - SEARCH;
+      let cy = y + i32(position / searchWidth) - SEARCH;
+      if (cx < 0 || cy < 0 || cx >= i32(config.width) || cy >= i32(config.height)) { continue; }
       if (cx == x && cy == y) { continue; }
+      let distance = matchDistance(cx, cy, referenceBase, cutoff);
+      if (distance < 0.0) { continue; }
       let candidate = sampleIndex(cx, cy);
-      if ((source[candidate] >> 24u) != 255u) { continue; }
-      var sum = 0.0;
-      var valid = true;
-      var k = 0u;
-      for (var dy = -PATCH; dy <= PATCH; dy++) {
-        for (var dx = -PATCH; dx <= PATCH; dx++) {
-          if (dx == 0 && dy == 0) { continue; }
-          let index = sampleIndex(cx + dx, cy + dy);
-          if ((source[index] >> 24u) != 255u) { valid = false; break; }
-          let difference = reference[k] - luma[index];
-          sum += min(difference * difference, 10000.0);
-          k++;
-          if (sum > cutoff * f32(samples)) { valid = false; break; }
-        }
-        if (!valid) { break; }
-      }
-      if (!valid) { continue; }
-      let distance = sum / f32(samples);
       var at = 0u;
       loop {
         if (at >= count) { break; }
         if (distances[at] > distance) { break; }
         at++;
       }
-      // Equal distances keep the original row-major candidate order.
+      // Each lane traverses its own row-major subsequence in order.
       if (at < 12u) {
         var slot = min(count, 11u);
         while (slot > at) {
@@ -128,25 +160,53 @@ fn repair(@builtin(global_invocation_id) id: vec3<u32>) {
     }
   }
 
-  var color = rgb(pixel);
-  if (count > 0u) {
-    if (distances[0] < 3.0 * config.h2) {
-      var total = 0.35;
-      var colors = color * total;
-      for (var k = 0u; k < count; k++) {
-        let weight = exp(-distances[k] / (config.h2 * 0.25));
-        total += weight;
-        colors += rgb(source[indices[k]]) * weight;
-      }
-      color = colors / total;
-    }
+  laneCounts[local] = count;
+  for (var k = 0u; k < count; k++) {
+    laneDistances[local * 12u + k] = distances[k];
+    laneIndices[local * 12u + k] = indices[k];
   }
+  workgroupBarrier();
+  if (lane != 0u || enabled[pixelSlot] == 0u) { return; }
+
+  // Any global top-12 candidate must belong to its lane's top 12.
+  // Merge the eight sorted lists, breaking ties by the original row-major index.
+  var heads: array<u32, 8>;
+  var total = 0.35;
+  var colors = rgb(pixel) * total;
+  for (var rank = 0u; rank < 12u; rank++) {
+    var chosen = 8u;
+    var closest = 0.0;
+    var candidate = 0u;
+    for (var k = 0u; k < 8u; k++) {
+      let thread = pixelSlot * 8u + k;
+      if (heads[k] >= laneCounts[thread]) { continue; }
+      let slot = thread * 12u + heads[k];
+      let distance = laneDistances[slot];
+      let index = laneIndices[slot];
+      if (chosen == 8u || distance < closest || (distance == closest && index < candidate)) {
+        chosen = k;
+        closest = distance;
+        candidate = index;
+      }
+    }
+    if (chosen == 8u) {
+      if (rank == 0u) { return; }
+      break;
+    }
+    if (rank == 0u && closest >= 3.0 * config.h2) { return; }
+    heads[chosen]++;
+    let weight = exp(-closest / (config.h2 * 0.25));
+    total += weight;
+    colors += rgb(source[candidate]) * weight;
+  }
+  let color = colors / total;
   let r = quantizeByte(color.r);
   let g = quantizeByte(color.g);
   let b = quantizeByte(color.b);
   output[destination] = r | (g << 8u) | (b << 16u) | (pixel & 0xff000000u);
 }
 `;
+  }
 
   async function apply({ data, width, height }, { patch, search, strength }, {
     roi = { x: 0, y: 0, w: width, h: height }, debug = () => {},
@@ -202,7 +262,7 @@ fn repair(@builtin(global_invocation_id) id: vec3<u32>) {
       ints.set([cropWidth, cropHeight, roi.x - left, roi.y - top, roi.w, roi.h]);
       floats[8] = strength * strength;
       device.queue.writeBuffer(uniform, 0, parameters);
-      const module = device.createShaderModule({ code: shader });
+      const module = device.createShaderModule({ code: buildShader(patch, search) });
       const compilation = await module.getCompilationInfo();
       for (const message of compilation.messages) {
         debug(`WGSL ${message.type} ${message.lineNum}:${message.linePos} ${message.message}`);
@@ -220,7 +280,7 @@ fn repair(@builtin(global_invocation_id) id: vec3<u32>) {
         layout: pipelineLayout, compute: { module, entryPoint: 'prepare' },
       });
       const pipeline = await device.createComputePipelineAsync({
-        layout: pipelineLayout, compute: { module, entryPoint: 'repair', constants: { PATCH: patch, SEARCH: search } },
+        layout: pipelineLayout, compute: { module, entryPoint: 'repair' },
       });
       const bindings = device.createBindGroup({ layout, entries: [input, luma, output, uniform]
         .map((buffer, binding) => ({ binding, resource: binding === 3 ? { buffer, size: 36 } : { buffer } })) });
@@ -230,7 +290,7 @@ fn repair(@builtin(global_invocation_id) id: vec3<u32>) {
       prepass.dispatchWorkgroups(256, Math.ceil(cropWidth * cropHeight / 16384));
       prepass.end();
       device.queue.submit([encoder.finish()]);
-      debug(`分批匹配：${totalPixels} 像素，初始每批 ${batchSize} 像素，最多两批在途，按约 16 ms 的完成节奏调整批量`);
+      debug(`分批匹配：${totalPixels} 像素，每工作组 8 像素、每像素 8 条线程；初始每批 ${batchSize} 像素，最多两批在途，按约 16 ms 的完成节奏调整批量`);
       const matchingStart = performance.now();
       let submissions = 0;
       await batchRunner.run({
@@ -242,7 +302,7 @@ fn repair(@builtin(global_invocation_id) id: vec3<u32>) {
           const matchingEncoder = device.createCommandEncoder();
           const pass = matchingEncoder.beginComputePass();
           pass.setPipeline(pipeline); pass.setBindGroup(0, bindings);
-          pass.dispatchWorkgroups(Math.ceil(count / 64)); pass.end();
+          pass.dispatchWorkgroups(Math.ceil(count / 8)); pass.end();
           device.queue.submit([matchingEncoder.finish()]);
           submissions++;
         },

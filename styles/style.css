@@ -1316,6 +1316,12 @@ button svg {
   align-items: center;
   gap: 12px;
 }
+.preview-source-picker {
+  margin-top: 10px;
+}
+.preview-source-picker > .button {
+  width: 100%;
+}
 .preview-select-row {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1326,9 +1332,14 @@ button svg {
   width: 100%;
   min-width: 0;
 }
-.preview-select-row select:disabled {
-  opacity: 0.42;
-  cursor: not-allowed;
+.preview-file-choice {
+  min-width: 0;
+}
+.preview-file-choice .button {
+  width: 100%;
+  height: 100%;
+  justify-content: flex-start;
+  color: var(--muted);
 }
 .preview-meta-row {
   display: flex;
