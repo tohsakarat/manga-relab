@@ -5,7 +5,1145 @@ const PreinstalledPipelines = (() => {
   {
     "format": "screenlab-pipeline",
     "version": 1,
-    "name": "标准修复流水线",
+    "name": "图源网点已经花了的流水线",
+    "graph": {
+      "nodes": {
+        "14263940-a7ee-4033-8abd-7340195e9bf3": {
+          "id": "14263940-a7ee-4033-8abd-7340195e9bf3",
+          "type": "input",
+          "name": "输入",
+          "x": -788.5263666142822,
+          "y": 153.5502885764147,
+          "params": {}
+        },
+        "0c54d63b-79f6-46ef-ba79-22dd49dc4941": {
+          "id": "0c54d63b-79f6-46ef-ba79-22dd49dc4941",
+          "type": "output",
+          "name": "输出低清",
+          "x": 1970.3912680247129,
+          "y": 119.7370112420517,
+          "params": {
+            "directory": {
+              "key": "pipeline:0a5d3e94-c5d2-49c1-bca8-c7e4d4d91bc5:0c54d63b-79f6-46ef-ba79-22dd49dc4941",
+              "name": ""
+            }
+          },
+          "outputMode": "directory",
+          "directoryName": "",
+          "outputSettings": {
+            "colorMode": "indexed",
+            "format": "png",
+            "quality": 95,
+            "indexBits": 4
+          }
+        },
+        "58e753a3-5cc1-40b0-9e5f-1c28cc409431": {
+          "id": "58e753a3-5cc1-40b0-9e5f-1c28cc409431",
+          "type": "denoise",
+          "name": "降噪",
+          "x": -387.88570176009347,
+          "y": 118.82615140770883,
+          "params": {
+            "patch": 2,
+            "search": 8,
+            "strength": 25
+          }
+        },
+        "229fdc1c-c69d-4f09-bf1c-5377bec70e24": {
+          "id": "229fdc1c-c69d-4f09-bf1c-5377bec70e24",
+          "type": "spine",
+          "name": "书籍去阴影",
+          "x": 630.4271759342632,
+          "y": 154.8223168909016,
+          "params": {
+            "scalePercent": 13.6,
+            "strength": 100,
+            "position": "unspecified"
+          }
+        },
+        "5907a428-aa53-44e2-b208-e7e35d9befe8": {
+          "id": "5907a428-aa53-44e2-b208-e7e35d9befe8",
+          "type": "sharpen",
+          "name": "USM 锐化",
+          "x": 970,
+          "y": 180,
+          "params": {
+            "amount": 285,
+            "radiusPercent": 0.96,
+            "threshold": 0
+          }
+        },
+        "2d30f25a-b4e6-4057-9205-b4d5a0453959": {
+          "id": "2d30f25a-b4e6-4057-9205-b4d5a0453959",
+          "type": "curve",
+          "name": "曲线",
+          "x": 1269.282428886698,
+          "y": 182.15274983894642,
+          "params": {
+            "points": [
+              {
+                "x": 0,
+                "y": 0
+              },
+              {
+                "x": 1,
+                "y": 0
+              },
+              {
+                "x": 7,
+                "y": 0
+              },
+              {
+                "x": 227,
+                "y": 255
+              },
+              {
+                "x": 255,
+                "y": 255
+              }
+            ]
+          }
+        },
+        "93bf7e49-a4a7-4bfd-9010-d3f72243e820": {
+          "id": "93bf7e49-a4a7-4bfd-9010-d3f72243e820",
+          "type": "resize",
+          "name": "缩放",
+          "x": 1617.4496471524058,
+          "y": 190.63916106195546,
+          "params": {
+            "size": {
+              "unit": "pixels",
+              "width": 1600,
+              "height": 1200,
+              "linked": true,
+              "axis": "width"
+            }
+          }
+        },
+        "5ffc2865-f6bc-406a-8b98-44093dc719dc": {
+          "id": "5ffc2865-f6bc-406a-8b98-44093dc719dc",
+          "type": "surface-blur",
+          "name": "表面模糊",
+          "x": 122.23293014254148,
+          "y": 99.80048968477172,
+          "params": {
+            "radius": 5,
+            "threshold": 20
+          }
+        },
+        "905083dd-408b-46aa-939a-b694661f91c9": {
+          "id": "905083dd-408b-46aa-939a-b694661f91c9",
+          "type": "output",
+          "name": "输出高清",
+          "x": 1988.0725963018265,
+          "y": 931.5646058697471,
+          "params": {
+            "directory": {
+              "key": "pipeline:0a5d3e94-c5d2-49c1-bca8-c7e4d4d91bc5:905083dd-408b-46aa-939a-b694661f91c9",
+              "name": ""
+            }
+          },
+          "outputMode": "directory",
+          "directoryName": "",
+          "outputSettings": {
+            "colorMode": "indexed",
+            "format": "png",
+            "quality": 95,
+            "indexBits": 2
+          }
+        }
+      },
+      "edges": [
+        {
+          "id": "a0d2e285-2c14-49a7-9841-77495e1eb7c5",
+          "from": {
+            "nodeId": "14263940-a7ee-4033-8abd-7340195e9bf3",
+            "port": "image"
+          },
+          "to": {
+            "nodeId": "58e753a3-5cc1-40b0-9e5f-1c28cc409431",
+            "port": "image"
+          }
+        },
+        {
+          "id": "e2b20334-32a6-4efd-a8ce-e4fa3315a989",
+          "from": {
+            "nodeId": "229fdc1c-c69d-4f09-bf1c-5377bec70e24",
+            "port": "image"
+          },
+          "to": {
+            "nodeId": "5907a428-aa53-44e2-b208-e7e35d9befe8",
+            "port": "image"
+          }
+        },
+        {
+          "id": "dd125771-2234-4d83-9e46-6d0fb6f48246",
+          "from": {
+            "nodeId": "5907a428-aa53-44e2-b208-e7e35d9befe8",
+            "port": "image"
+          },
+          "to": {
+            "nodeId": "2d30f25a-b4e6-4057-9205-b4d5a0453959",
+            "port": "image"
+          }
+        },
+        {
+          "id": "013379f5-2974-48ad-bb27-f7973dfbb5a5",
+          "from": {
+            "nodeId": "14263940-a7ee-4033-8abd-7340195e9bf3",
+            "port": "c1e93038-3e7f-44d2-b40e-8908e60aae62"
+          },
+          "to": {
+            "nodeId": "58e753a3-5cc1-40b0-9e5f-1c28cc409431",
+            "port": "patch"
+          }
+        },
+        {
+          "id": "f5e1357c-4172-4eff-afc9-d53f68539a8f",
+          "from": {
+            "nodeId": "14263940-a7ee-4033-8abd-7340195e9bf3",
+            "port": "a1dbb03b-a004-4f15-9234-1c5e07d734cb"
+          },
+          "to": {
+            "nodeId": "58e753a3-5cc1-40b0-9e5f-1c28cc409431",
+            "port": "search"
+          }
+        },
+        {
+          "id": "5a241720-9331-40f4-b781-505c19cd5c41",
+          "from": {
+            "nodeId": "14263940-a7ee-4033-8abd-7340195e9bf3",
+            "port": "bb439749-9b39-4b78-8a76-edb673ba8d86"
+          },
+          "to": {
+            "nodeId": "58e753a3-5cc1-40b0-9e5f-1c28cc409431",
+            "port": "strength"
+          }
+        },
+        {
+          "id": "a5b78de5-1803-4ed5-8b98-07936cc6d239",
+          "from": {
+            "nodeId": "14263940-a7ee-4033-8abd-7340195e9bf3",
+            "port": "16445ebd-1a96-4074-9e38-f1ed9c36d664"
+          },
+          "to": {
+            "nodeId": "229fdc1c-c69d-4f09-bf1c-5377bec70e24",
+            "port": "scalePercent"
+          }
+        },
+        {
+          "id": "8d3e3b92-f760-414b-8ef5-7c502eed8d66",
+          "from": {
+            "nodeId": "14263940-a7ee-4033-8abd-7340195e9bf3",
+            "port": "ebf36720-72fe-4237-9a75-d3d26239b43b"
+          },
+          "to": {
+            "nodeId": "229fdc1c-c69d-4f09-bf1c-5377bec70e24",
+            "port": "strength"
+          }
+        },
+        {
+          "id": "cd232a9b-7fed-429d-a5c7-6c234099f786",
+          "from": {
+            "nodeId": "14263940-a7ee-4033-8abd-7340195e9bf3",
+            "port": "ad30c9b8-15cc-43c9-960e-5e9079aa4a53"
+          },
+          "to": {
+            "nodeId": "229fdc1c-c69d-4f09-bf1c-5377bec70e24",
+            "port": "position"
+          }
+        },
+        {
+          "id": "8f125e1e-a59d-4b79-bce1-67fb1b1f2f19",
+          "from": {
+            "nodeId": "14263940-a7ee-4033-8abd-7340195e9bf3",
+            "port": "bad7c903-d49a-4ac6-ac72-37037636fdc9"
+          },
+          "to": {
+            "nodeId": "2d30f25a-b4e6-4057-9205-b4d5a0453959",
+            "port": "points"
+          }
+        },
+        {
+          "id": "97436620-031e-4ee3-9df5-7672ae80828e",
+          "from": {
+            "nodeId": "2d30f25a-b4e6-4057-9205-b4d5a0453959",
+            "port": "image"
+          },
+          "to": {
+            "nodeId": "93bf7e49-a4a7-4bfd-9010-d3f72243e820",
+            "port": "image"
+          }
+        },
+        {
+          "id": "d9dd6c5a-e88d-4e69-84ae-a18ffed62230",
+          "from": {
+            "nodeId": "93bf7e49-a4a7-4bfd-9010-d3f72243e820",
+            "port": "image"
+          },
+          "to": {
+            "nodeId": "0c54d63b-79f6-46ef-ba79-22dd49dc4941",
+            "port": "image"
+          }
+        },
+        {
+          "id": "9072dc9d-9efe-4172-ac04-a4046451d213",
+          "from": {
+            "nodeId": "14263940-a7ee-4033-8abd-7340195e9bf3",
+            "port": "b1bb2d8a-2f34-465d-81cd-b62f23a7a6c4"
+          },
+          "to": {
+            "nodeId": "0c54d63b-79f6-46ef-ba79-22dd49dc4941",
+            "port": "directory"
+          }
+        },
+        {
+          "id": "35c3b095-86af-4d20-aa72-8b505f9929d6",
+          "from": {
+            "nodeId": "14263940-a7ee-4033-8abd-7340195e9bf3",
+            "port": "0b4ac405-7ee3-4541-8cdf-4df6b1ad7092"
+          },
+          "to": {
+            "nodeId": "93bf7e49-a4a7-4bfd-9010-d3f72243e820",
+            "port": "size"
+          }
+        },
+        {
+          "id": "36fa93ba-ccc1-4e31-86bb-b98f8f870f24",
+          "from": {
+            "nodeId": "58e753a3-5cc1-40b0-9e5f-1c28cc409431",
+            "port": "image"
+          },
+          "to": {
+            "nodeId": "5ffc2865-f6bc-406a-8b98-44093dc719dc",
+            "port": "image"
+          }
+        },
+        {
+          "id": "58cadfbe-bd69-4a77-91ec-9453ee249e61",
+          "from": {
+            "nodeId": "5ffc2865-f6bc-406a-8b98-44093dc719dc",
+            "port": "image"
+          },
+          "to": {
+            "nodeId": "229fdc1c-c69d-4f09-bf1c-5377bec70e24",
+            "port": "image"
+          }
+        },
+        {
+          "id": "39ddd586-fde3-4c60-88e9-aef25beff19e",
+          "from": {
+            "nodeId": "2d30f25a-b4e6-4057-9205-b4d5a0453959",
+            "port": "image"
+          },
+          "to": {
+            "nodeId": "905083dd-408b-46aa-939a-b694661f91c9",
+            "port": "image"
+          }
+        },
+        {
+          "id": "ea18144c-9ea4-4f9d-8141-2772d89b4b97",
+          "from": {
+            "nodeId": "14263940-a7ee-4033-8abd-7340195e9bf3",
+            "port": "7d96a6bf-4636-46e2-89d4-3dbb71e87e99"
+          },
+          "to": {
+            "nodeId": "905083dd-408b-46aa-939a-b694661f91c9",
+            "port": "directory"
+          }
+        }
+      ],
+      "exposedVars": [
+        {
+          "variableId": "c1e93038-3e7f-44d2-b40e-8908e60aae62",
+          "sourceNodeId": "58e753a3-5cc1-40b0-9e5f-1c28cc409431",
+          "paramKey": "patch",
+          "displayName": "降噪.图块半径",
+          "defaultValue": 2,
+          "spec": {
+            "key": "patch",
+            "label": "图块半径",
+            "type": "integer",
+            "min": 2,
+            "max": 8,
+            "step": 1,
+            "default": 4
+          }
+        },
+        {
+          "variableId": "a1dbb03b-a004-4f15-9234-1c5e07d734cb",
+          "sourceNodeId": "58e753a3-5cc1-40b0-9e5f-1c28cc409431",
+          "paramKey": "search",
+          "displayName": "降噪.搜索半径",
+          "defaultValue": 8,
+          "spec": {
+            "key": "search",
+            "label": "搜索半径",
+            "type": "integer",
+            "min": 4,
+            "max": 24,
+            "step": 1,
+            "default": 12
+          }
+        },
+        {
+          "variableId": "bb439749-9b39-4b78-8a76-edb673ba8d86",
+          "sourceNodeId": "58e753a3-5cc1-40b0-9e5f-1c28cc409431",
+          "paramKey": "strength",
+          "displayName": "降噪.匹配容差",
+          "defaultValue": 80,
+          "spec": {
+            "key": "strength",
+            "label": "匹配容差",
+            "type": "number",
+            "min": 5,
+            "max": 80,
+            "step": 1,
+            "default": 25
+          }
+        },
+        {
+          "variableId": "16445ebd-1a96-4074-9e38-f1ed9c36d664",
+          "sourceNodeId": "229fdc1c-c69d-4f09-bf1c-5377bec70e24",
+          "paramKey": "scalePercent",
+          "displayName": "书籍去阴影.阴影尺度（页面宽度 %）",
+          "defaultValue": 13.6,
+          "spec": {
+            "key": "scalePercent",
+            "label": "阴影尺度（页面宽度 %）",
+            "type": "number",
+            "min": 0,
+            "max": 30,
+            "step": 0.1,
+            "default": 5
+          }
+        },
+        {
+          "variableId": "ebf36720-72fe-4237-9a75-d3d26239b43b",
+          "sourceNodeId": "229fdc1c-c69d-4f09-bf1c-5377bec70e24",
+          "paramKey": "strength",
+          "displayName": "书籍去阴影.校正强度（%）",
+          "defaultValue": 100,
+          "spec": {
+            "key": "strength",
+            "label": "校正强度（%）",
+            "type": "number",
+            "min": 0,
+            "max": 100,
+            "step": 1,
+            "default": 100
+          }
+        },
+        {
+          "variableId": "ad30c9b8-15cc-43c9-960e-5e9079aa4a53",
+          "sourceNodeId": "229fdc1c-c69d-4f09-bf1c-5377bec70e24",
+          "paramKey": "position",
+          "displayName": "书籍去阴影.阴影位置",
+          "defaultValue": "unspecified",
+          "spec": {
+            "key": "position",
+            "label": "阴影位置",
+            "type": "enum",
+            "values": [
+              "center",
+              "left",
+              "right",
+              "top",
+              "bottom",
+              "unspecified"
+            ],
+            "default": "unspecified"
+          }
+        },
+        {
+          "variableId": "bad7c903-d49a-4ac6-ac72-37037636fdc9",
+          "sourceNodeId": "2d30f25a-b4e6-4057-9205-b4d5a0453959",
+          "paramKey": "points",
+          "displayName": "曲线.曲线点",
+          "defaultValue": [
+            {
+              "x": 0,
+              "y": 0
+            },
+            {
+              "x": 1,
+              "y": 0
+            },
+            {
+              "x": 7,
+              "y": 0
+            },
+            {
+              "x": 227,
+              "y": 255
+            },
+            {
+              "x": 255,
+              "y": 255
+            }
+          ],
+          "spec": {
+            "key": "points",
+            "label": "曲线点",
+            "type": "json",
+            "range": "array of {x,y}: integer 0..255; x strictly ascending; first x=0, last x=255",
+            "default": [
+              {
+                "x": 0,
+                "y": 0
+              },
+              {
+                "x": 255,
+                "y": 255
+              }
+            ]
+          }
+        },
+        {
+          "variableId": "b1bb2d8a-2f34-465d-81cd-b62f23a7a6c4",
+          "sourceNodeId": "0c54d63b-79f6-46ef-ba79-22dd49dc4941",
+          "paramKey": "directory",
+          "displayName": "输出低清.输出目录",
+          "defaultValue": {
+            "key": "pipeline:0a5d3e94-c5d2-49c1-bca8-c7e4d4d91bc5:0c54d63b-79f6-46ef-ba79-22dd49dc4941",
+            "name": ""
+          },
+          "spec": {
+            "key": "directory",
+            "label": "输出目录",
+            "type": "directory",
+            "default": {
+              "key": "",
+              "name": ""
+            }
+          }
+        },
+        {
+          "variableId": "0b4ac405-7ee3-4541-8cdf-4df6b1ad7092",
+          "sourceNodeId": "93bf7e49-a4a7-4bfd-9010-d3f72243e820",
+          "paramKey": "size",
+          "displayName": "缩放.尺寸",
+          "defaultValue": {
+            "unit": "pixels",
+            "width": 1600,
+            "height": 1200,
+            "linked": true,
+            "axis": "width"
+          },
+          "spec": {
+            "key": "size",
+            "label": "尺寸",
+            "type": "json",
+            "editor": "resize",
+            "default": {
+              "unit": "percent",
+              "width": 100,
+              "height": 100,
+              "linked": true,
+              "axis": "width"
+            }
+          }
+        },
+        {
+          "variableId": "7d96a6bf-4636-46e2-89d4-3dbb71e87e99",
+          "sourceNodeId": "905083dd-408b-46aa-939a-b694661f91c9",
+          "paramKey": "directory",
+          "displayName": "输出高清.输出目录",
+          "defaultValue": {
+            "key": "pipeline:0a5d3e94-c5d2-49c1-bca8-c7e4d4d91bc5:905083dd-408b-46aa-939a-b694661f91c9",
+            "name": ""
+          },
+          "spec": {
+            "key": "directory",
+            "label": "输出目录",
+            "type": "directory",
+            "default": {
+              "key": "",
+              "name": ""
+            }
+          }
+        }
+      ],
+      "view": {
+        "x": 729.1627418960738,
+        "y": 6.3442038194754105,
+        "zoom": 0.8630678035982761
+      }
+    }
+  },
+  {
+    "format": "screenlab-pipeline",
+    "version": 1,
+    "name": "纸质不太的修复流水线（预览有点慢）",
+    "graph": {
+      "nodes": {
+        "14263940-a7ee-4033-8abd-7340195e9bf3": {
+          "id": "14263940-a7ee-4033-8abd-7340195e9bf3",
+          "type": "input",
+          "name": "输入",
+          "x": -793.6334067417117,
+          "y": 168.02021125191308,
+          "params": {}
+        },
+        "0c54d63b-79f6-46ef-ba79-22dd49dc4941": {
+          "id": "0c54d63b-79f6-46ef-ba79-22dd49dc4941",
+          "type": "output",
+          "name": "输出低清",
+          "x": 1382.1845506074362,
+          "y": 305.4209094494805,
+          "params": {
+            "directory": {
+              "key": "pipeline:0a5d3e94-c5d2-49c1-bca8-c7e4d4d91bc5:0c54d63b-79f6-46ef-ba79-22dd49dc4941",
+              "name": ""
+            }
+          },
+          "outputMode": "directory",
+          "directoryName": "",
+          "outputSettings": {
+            "colorMode": "indexed",
+            "format": "png",
+            "quality": 95,
+            "indexBits": 4
+          }
+        },
+        "58e753a3-5cc1-40b0-9e5f-1c28cc409431": {
+          "id": "58e753a3-5cc1-40b0-9e5f-1c28cc409431",
+          "type": "denoise",
+          "name": "降噪",
+          "x": -476.1819290820871,
+          "y": 142.21970020583925,
+          "params": {
+            "patch": 4,
+            "search": 12,
+            "strength": 25
+          }
+        },
+        "229fdc1c-c69d-4f09-bf1c-5377bec70e24": {
+          "id": "229fdc1c-c69d-4f09-bf1c-5377bec70e24",
+          "type": "spine",
+          "name": "书籍去阴影",
+          "x": 121.97741613312883,
+          "y": 197.19318725419592,
+          "params": {
+            "scalePercent": 13.6,
+            "strength": 100,
+            "position": "unspecified"
+          }
+        },
+        "5907a428-aa53-44e2-b208-e7e35d9befe8": {
+          "id": "5907a428-aa53-44e2-b208-e7e35d9befe8",
+          "type": "sharpen",
+          "name": "USM 锐化",
+          "x": 431.6413703965874,
+          "y": 222.37082757839448,
+          "params": {
+            "amount": 301,
+            "radiusPercent": 2.32,
+            "threshold": 0
+          }
+        },
+        "2d30f25a-b4e6-4057-9205-b4d5a0453959": {
+          "id": "2d30f25a-b4e6-4057-9205-b4d5a0453959",
+          "type": "curve",
+          "name": "曲线",
+          "x": 738.3261414477406,
+          "y": 248.4755242264617,
+          "params": {
+            "points": [
+              {
+                "x": 0,
+                "y": 5
+              },
+              {
+                "x": 1,
+                "y": 0
+              },
+              {
+                "x": 79,
+                "y": 0
+              },
+              {
+                "x": 169,
+                "y": 255
+              },
+              {
+                "x": 255,
+                "y": 255
+              }
+            ]
+          }
+        },
+        "93bf7e49-a4a7-4bfd-9010-d3f72243e820": {
+          "id": "93bf7e49-a4a7-4bfd-9010-d3f72243e820",
+          "type": "resize",
+          "name": "缩放",
+          "x": 1066.6289742030772,
+          "y": 276.6270547812559,
+          "params": {
+            "size": {
+              "unit": "pixels",
+              "width": 1600,
+              "height": 1200,
+              "linked": true,
+              "axis": "width"
+            }
+          }
+        },
+        "5ffc2865-f6bc-406a-8b98-44093dc719dc": {
+          "id": "5ffc2865-f6bc-406a-8b98-44093dc719dc",
+          "type": "surface-blur",
+          "name": "表面模糊",
+          "x": -176.85516889164342,
+          "y": 169.58775272532137,
+          "params": {
+            "radius": 100,
+            "threshold": 5
+          }
+        },
+        "905083dd-408b-46aa-939a-b694661f91c9": {
+          "id": "905083dd-408b-46aa-939a-b694661f91c9",
+          "type": "output",
+          "name": "输出高清",
+          "x": 1080.838647408579,
+          "y": 737.157294434137,
+          "params": {
+            "directory": {
+              "key": "pipeline:0a5d3e94-c5d2-49c1-bca8-c7e4d4d91bc5:905083dd-408b-46aa-939a-b694661f91c9",
+              "name": ""
+            }
+          },
+          "outputMode": "directory",
+          "directoryName": "",
+          "outputSettings": {
+            "colorMode": "indexed",
+            "format": "png",
+            "quality": 95,
+            "indexBits": 2
+          }
+        }
+      },
+      "edges": [
+        {
+          "id": "a0d2e285-2c14-49a7-9841-77495e1eb7c5",
+          "from": {
+            "nodeId": "14263940-a7ee-4033-8abd-7340195e9bf3",
+            "port": "image"
+          },
+          "to": {
+            "nodeId": "58e753a3-5cc1-40b0-9e5f-1c28cc409431",
+            "port": "image"
+          }
+        },
+        {
+          "id": "e2b20334-32a6-4efd-a8ce-e4fa3315a989",
+          "from": {
+            "nodeId": "229fdc1c-c69d-4f09-bf1c-5377bec70e24",
+            "port": "image"
+          },
+          "to": {
+            "nodeId": "5907a428-aa53-44e2-b208-e7e35d9befe8",
+            "port": "image"
+          }
+        },
+        {
+          "id": "dd125771-2234-4d83-9e46-6d0fb6f48246",
+          "from": {
+            "nodeId": "5907a428-aa53-44e2-b208-e7e35d9befe8",
+            "port": "image"
+          },
+          "to": {
+            "nodeId": "2d30f25a-b4e6-4057-9205-b4d5a0453959",
+            "port": "image"
+          }
+        },
+        {
+          "id": "013379f5-2974-48ad-bb27-f7973dfbb5a5",
+          "from": {
+            "nodeId": "14263940-a7ee-4033-8abd-7340195e9bf3",
+            "port": "c1e93038-3e7f-44d2-b40e-8908e60aae62"
+          },
+          "to": {
+            "nodeId": "58e753a3-5cc1-40b0-9e5f-1c28cc409431",
+            "port": "patch"
+          }
+        },
+        {
+          "id": "f5e1357c-4172-4eff-afc9-d53f68539a8f",
+          "from": {
+            "nodeId": "14263940-a7ee-4033-8abd-7340195e9bf3",
+            "port": "a1dbb03b-a004-4f15-9234-1c5e07d734cb"
+          },
+          "to": {
+            "nodeId": "58e753a3-5cc1-40b0-9e5f-1c28cc409431",
+            "port": "search"
+          }
+        },
+        {
+          "id": "5a241720-9331-40f4-b781-505c19cd5c41",
+          "from": {
+            "nodeId": "14263940-a7ee-4033-8abd-7340195e9bf3",
+            "port": "bb439749-9b39-4b78-8a76-edb673ba8d86"
+          },
+          "to": {
+            "nodeId": "58e753a3-5cc1-40b0-9e5f-1c28cc409431",
+            "port": "strength"
+          }
+        },
+        {
+          "id": "a5b78de5-1803-4ed5-8b98-07936cc6d239",
+          "from": {
+            "nodeId": "14263940-a7ee-4033-8abd-7340195e9bf3",
+            "port": "16445ebd-1a96-4074-9e38-f1ed9c36d664"
+          },
+          "to": {
+            "nodeId": "229fdc1c-c69d-4f09-bf1c-5377bec70e24",
+            "port": "scalePercent"
+          }
+        },
+        {
+          "id": "8d3e3b92-f760-414b-8ef5-7c502eed8d66",
+          "from": {
+            "nodeId": "14263940-a7ee-4033-8abd-7340195e9bf3",
+            "port": "ebf36720-72fe-4237-9a75-d3d26239b43b"
+          },
+          "to": {
+            "nodeId": "229fdc1c-c69d-4f09-bf1c-5377bec70e24",
+            "port": "strength"
+          }
+        },
+        {
+          "id": "cd232a9b-7fed-429d-a5c7-6c234099f786",
+          "from": {
+            "nodeId": "14263940-a7ee-4033-8abd-7340195e9bf3",
+            "port": "ad30c9b8-15cc-43c9-960e-5e9079aa4a53"
+          },
+          "to": {
+            "nodeId": "229fdc1c-c69d-4f09-bf1c-5377bec70e24",
+            "port": "position"
+          }
+        },
+        {
+          "id": "8f125e1e-a59d-4b79-bce1-67fb1b1f2f19",
+          "from": {
+            "nodeId": "14263940-a7ee-4033-8abd-7340195e9bf3",
+            "port": "bad7c903-d49a-4ac6-ac72-37037636fdc9"
+          },
+          "to": {
+            "nodeId": "2d30f25a-b4e6-4057-9205-b4d5a0453959",
+            "port": "points"
+          }
+        },
+        {
+          "id": "97436620-031e-4ee3-9df5-7672ae80828e",
+          "from": {
+            "nodeId": "2d30f25a-b4e6-4057-9205-b4d5a0453959",
+            "port": "image"
+          },
+          "to": {
+            "nodeId": "93bf7e49-a4a7-4bfd-9010-d3f72243e820",
+            "port": "image"
+          }
+        },
+        {
+          "id": "d9dd6c5a-e88d-4e69-84ae-a18ffed62230",
+          "from": {
+            "nodeId": "93bf7e49-a4a7-4bfd-9010-d3f72243e820",
+            "port": "image"
+          },
+          "to": {
+            "nodeId": "0c54d63b-79f6-46ef-ba79-22dd49dc4941",
+            "port": "image"
+          }
+        },
+        {
+          "id": "9072dc9d-9efe-4172-ac04-a4046451d213",
+          "from": {
+            "nodeId": "14263940-a7ee-4033-8abd-7340195e9bf3",
+            "port": "b1bb2d8a-2f34-465d-81cd-b62f23a7a6c4"
+          },
+          "to": {
+            "nodeId": "0c54d63b-79f6-46ef-ba79-22dd49dc4941",
+            "port": "directory"
+          }
+        },
+        {
+          "id": "35c3b095-86af-4d20-aa72-8b505f9929d6",
+          "from": {
+            "nodeId": "14263940-a7ee-4033-8abd-7340195e9bf3",
+            "port": "0b4ac405-7ee3-4541-8cdf-4df6b1ad7092"
+          },
+          "to": {
+            "nodeId": "93bf7e49-a4a7-4bfd-9010-d3f72243e820",
+            "port": "size"
+          }
+        },
+        {
+          "id": "36fa93ba-ccc1-4e31-86bb-b98f8f870f24",
+          "from": {
+            "nodeId": "58e753a3-5cc1-40b0-9e5f-1c28cc409431",
+            "port": "image"
+          },
+          "to": {
+            "nodeId": "5ffc2865-f6bc-406a-8b98-44093dc719dc",
+            "port": "image"
+          }
+        },
+        {
+          "id": "58cadfbe-bd69-4a77-91ec-9453ee249e61",
+          "from": {
+            "nodeId": "5ffc2865-f6bc-406a-8b98-44093dc719dc",
+            "port": "image"
+          },
+          "to": {
+            "nodeId": "229fdc1c-c69d-4f09-bf1c-5377bec70e24",
+            "port": "image"
+          }
+        },
+        {
+          "id": "39ddd586-fde3-4c60-88e9-aef25beff19e",
+          "from": {
+            "nodeId": "2d30f25a-b4e6-4057-9205-b4d5a0453959",
+            "port": "image"
+          },
+          "to": {
+            "nodeId": "905083dd-408b-46aa-939a-b694661f91c9",
+            "port": "image"
+          }
+        },
+        {
+          "id": "ea18144c-9ea4-4f9d-8141-2772d89b4b97",
+          "from": {
+            "nodeId": "14263940-a7ee-4033-8abd-7340195e9bf3",
+            "port": "7d96a6bf-4636-46e2-89d4-3dbb71e87e99"
+          },
+          "to": {
+            "nodeId": "905083dd-408b-46aa-939a-b694661f91c9",
+            "port": "directory"
+          }
+        }
+      ],
+      "exposedVars": [
+        {
+          "variableId": "c1e93038-3e7f-44d2-b40e-8908e60aae62",
+          "sourceNodeId": "58e753a3-5cc1-40b0-9e5f-1c28cc409431",
+          "paramKey": "patch",
+          "displayName": "降噪.图块半径",
+          "defaultValue": 4,
+          "spec": {
+            "key": "patch",
+            "label": "图块半径",
+            "type": "integer",
+            "min": 2,
+            "max": 8,
+            "step": 1,
+            "default": 4
+          }
+        },
+        {
+          "variableId": "a1dbb03b-a004-4f15-9234-1c5e07d734cb",
+          "sourceNodeId": "58e753a3-5cc1-40b0-9e5f-1c28cc409431",
+          "paramKey": "search",
+          "displayName": "降噪.搜索半径",
+          "defaultValue": 12,
+          "spec": {
+            "key": "search",
+            "label": "搜索半径",
+            "type": "integer",
+            "min": 4,
+            "max": 24,
+            "step": 1,
+            "default": 12
+          }
+        },
+        {
+          "variableId": "bb439749-9b39-4b78-8a76-edb673ba8d86",
+          "sourceNodeId": "58e753a3-5cc1-40b0-9e5f-1c28cc409431",
+          "paramKey": "strength",
+          "displayName": "降噪.匹配容差",
+          "defaultValue": 80,
+          "spec": {
+            "key": "strength",
+            "label": "匹配容差",
+            "type": "number",
+            "min": 5,
+            "max": 80,
+            "step": 1,
+            "default": 25
+          }
+        },
+        {
+          "variableId": "16445ebd-1a96-4074-9e38-f1ed9c36d664",
+          "sourceNodeId": "229fdc1c-c69d-4f09-bf1c-5377bec70e24",
+          "paramKey": "scalePercent",
+          "displayName": "书籍去阴影.阴影尺度（页面宽度 %）",
+          "defaultValue": 13.6,
+          "spec": {
+            "key": "scalePercent",
+            "label": "阴影尺度（页面宽度 %）",
+            "type": "number",
+            "min": 0,
+            "max": 30,
+            "step": 0.1,
+            "default": 5
+          }
+        },
+        {
+          "variableId": "ebf36720-72fe-4237-9a75-d3d26239b43b",
+          "sourceNodeId": "229fdc1c-c69d-4f09-bf1c-5377bec70e24",
+          "paramKey": "strength",
+          "displayName": "书籍去阴影.校正强度（%）",
+          "defaultValue": 100,
+          "spec": {
+            "key": "strength",
+            "label": "校正强度（%）",
+            "type": "number",
+            "min": 0,
+            "max": 100,
+            "step": 1,
+            "default": 100
+          }
+        },
+        {
+          "variableId": "ad30c9b8-15cc-43c9-960e-5e9079aa4a53",
+          "sourceNodeId": "229fdc1c-c69d-4f09-bf1c-5377bec70e24",
+          "paramKey": "position",
+          "displayName": "书籍去阴影.阴影位置",
+          "defaultValue": "unspecified",
+          "spec": {
+            "key": "position",
+            "label": "阴影位置",
+            "type": "enum",
+            "values": [
+              "center",
+              "left",
+              "right",
+              "top",
+              "bottom",
+              "unspecified"
+            ],
+            "default": "unspecified"
+          }
+        },
+        {
+          "variableId": "bad7c903-d49a-4ac6-ac72-37037636fdc9",
+          "sourceNodeId": "2d30f25a-b4e6-4057-9205-b4d5a0453959",
+          "paramKey": "points",
+          "displayName": "曲线.曲线点",
+          "defaultValue": [
+            {
+              "x": 0,
+              "y": 5
+            },
+            {
+              "x": 1,
+              "y": 0
+            },
+            {
+              "x": 79,
+              "y": 0
+            },
+            {
+              "x": 169,
+              "y": 255
+            },
+            {
+              "x": 255,
+              "y": 255
+            }
+          ],
+          "spec": {
+            "key": "points",
+            "label": "曲线点",
+            "type": "json",
+            "range": "array of {x,y}: integer 0..255; x strictly ascending; first x=0, last x=255",
+            "default": [
+              {
+                "x": 0,
+                "y": 0
+              },
+              {
+                "x": 255,
+                "y": 255
+              }
+            ]
+          }
+        },
+        {
+          "variableId": "b1bb2d8a-2f34-465d-81cd-b62f23a7a6c4",
+          "sourceNodeId": "0c54d63b-79f6-46ef-ba79-22dd49dc4941",
+          "paramKey": "directory",
+          "displayName": "输出低清.输出目录",
+          "defaultValue": {
+            "key": "pipeline:0a5d3e94-c5d2-49c1-bca8-c7e4d4d91bc5:0c54d63b-79f6-46ef-ba79-22dd49dc4941",
+            "name": ""
+          },
+          "spec": {
+            "key": "directory",
+            "label": "输出目录",
+            "type": "directory",
+            "default": {
+              "key": "",
+              "name": ""
+            }
+          }
+        },
+        {
+          "variableId": "0b4ac405-7ee3-4541-8cdf-4df6b1ad7092",
+          "sourceNodeId": "93bf7e49-a4a7-4bfd-9010-d3f72243e820",
+          "paramKey": "size",
+          "displayName": "缩放.尺寸",
+          "defaultValue": {
+            "unit": "pixels",
+            "width": 1600,
+            "height": 1200,
+            "linked": true,
+            "axis": "width"
+          },
+          "spec": {
+            "key": "size",
+            "label": "尺寸",
+            "type": "json",
+            "editor": "resize",
+            "default": {
+              "unit": "percent",
+              "width": 100,
+              "height": 100,
+              "linked": true,
+              "axis": "width"
+            }
+          }
+        },
+        {
+          "variableId": "7d96a6bf-4636-46e2-89d4-3dbb71e87e99",
+          "sourceNodeId": "905083dd-408b-46aa-939a-b694661f91c9",
+          "paramKey": "directory",
+          "displayName": "输出高清.输出目录",
+          "defaultValue": {
+            "key": "pipeline:0a5d3e94-c5d2-49c1-bca8-c7e4d4d91bc5:905083dd-408b-46aa-939a-b694661f91c9",
+            "name": ""
+          },
+          "spec": {
+            "key": "directory",
+            "label": "输出目录",
+            "type": "directory",
+            "default": {
+              "key": "",
+              "name": ""
+            }
+          }
+        }
+      ],
+      "view": {
+        "x": 443.2514772371598,
+        "y": -92.85355346354379,
+        "zoom": 0.5358972025000072
+      }
+    }
+  },
+  {
+    "format": "screenlab-pipeline",
+    "version": 1,
+    "name": "网点清晰图源大",
     "graph": {
       "nodes": {
         "14263940-a7ee-4033-8abd-7340195e9bf3": {
@@ -20,18 +1158,30 @@ const PreinstalledPipelines = (() => {
           "id": "0c54d63b-79f6-46ef-ba79-22dd49dc4941",
           "type": "output",
           "name": "输出",
-          "x": 1570,
-          "y": 180,
-          "params": {},
+          "x": 1931.5951550544796,
+          "y": 136.8739353698405,
+          "params": {
+            "directory": {
+              "key": "",
+              "name": ""
+            }
+          },
           "outputMode": "directory",
-          "directoryName": ""
+          "directoryName": "",
+          "outputSettings": {
+            "colorMode": "indexed",
+            "format": "png",
+            "quality": 95,
+            "indexBits": 2,
+            "conflictMode": "overwrite"
+          }
         },
         "58e753a3-5cc1-40b0-9e5f-1c28cc409431": {
           "id": "58e753a3-5cc1-40b0-9e5f-1c28cc409431",
           "type": "denoise",
           "name": "降噪",
-          "x": 302.56941706009013,
-          "y": 105.42397063245187,
+          "x": 300.744861822089,
+          "y": 120.02050649851918,
           "params": {
             "patch": 4,
             "search": 12,
@@ -45,7 +1195,7 @@ const PreinstalledPipelines = (() => {
           "x": 680.1880011211025,
           "y": 152.83197272028264,
           "params": {
-            "scalePercent": 13.6,
+            "scalePercent": 6.4,
             "strength": 100,
             "position": "unspecified"
           }
@@ -87,6 +1237,44 @@ const PreinstalledPipelines = (() => {
                 "y": 255
               }
             ]
+          }
+        },
+        "87155e17-ac5e-4fcd-b4bc-e2740bb3d750": {
+          "id": "87155e17-ac5e-4fcd-b4bc-e2740bb3d750",
+          "type": "resize",
+          "name": "缩放",
+          "x": 1584.526277088117,
+          "y": 480.4262002267339,
+          "params": {
+            "size": {
+              "unit": "pixels",
+              "width": 1600,
+              "height": 1211,
+              "linked": true,
+              "axis": "width"
+            }
+          }
+        },
+        "8a621a55-90db-480b-ae95-fb7d42f974a8": {
+          "id": "8a621a55-90db-480b-ae95-fb7d42f974a8",
+          "type": "output",
+          "name": "输出",
+          "x": 1887.0303454581597,
+          "y": 955.434242383906,
+          "params": {
+            "directory": {
+              "key": "",
+              "name": ""
+            }
+          },
+          "outputMode": "directory",
+          "directoryName": "",
+          "outputSettings": {
+            "colorMode": "indexed",
+            "format": "png",
+            "quality": 95,
+            "indexBits": 3,
+            "conflictMode": "overwrite"
           }
         }
       },
@@ -222,6 +1410,28 @@ const PreinstalledPipelines = (() => {
             "nodeId": "2d30f25a-b4e6-4057-9205-b4d5a0453959",
             "port": "points"
           }
+        },
+        {
+          "id": "4bcd952d-5925-4725-98ed-9be89b50299f",
+          "from": {
+            "nodeId": "2d30f25a-b4e6-4057-9205-b4d5a0453959",
+            "port": "image"
+          },
+          "to": {
+            "nodeId": "87155e17-ac5e-4fcd-b4bc-e2740bb3d750",
+            "port": "image"
+          }
+        },
+        {
+          "id": "3be0db53-0e71-430d-bafe-ede0a1c544ed",
+          "from": {
+            "nodeId": "87155e17-ac5e-4fcd-b4bc-e2740bb3d750",
+            "port": "image"
+          },
+          "to": {
+            "nodeId": "8a621a55-90db-480b-ae95-fb7d42f974a8",
+            "port": "image"
+          }
         }
       ],
       "exposedVars": [
@@ -278,7 +1488,7 @@ const PreinstalledPipelines = (() => {
           "sourceNodeId": "229fdc1c-c69d-4f09-bf1c-5377bec70e24",
           "paramKey": "scalePercent",
           "displayName": "去阴影.阴影尺度（页面宽度 %）",
-          "defaultValue": 13.6,
+          "defaultValue": 6.4,
           "spec": {
             "key": "scalePercent",
             "label": "阴影尺度（页面宽度 %）",
@@ -368,9 +1578,9 @@ const PreinstalledPipelines = (() => {
         }
       ],
       "view": {
-        "x": 676.4860322331208,
-        "y": -91.09043733655744,
-        "zoom": 1.2636175712482376
+        "x": 197.96584494420722,
+        "y": -16.744269156802375,
+        "zoom": 0.48717927500000124
       }
     }
   }
