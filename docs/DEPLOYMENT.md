@@ -8,7 +8,7 @@
 - 生产分支：`main`
 - 发布目录：`dist/`
 - 默认地址：`https://manga-relab.pages.dev/`，首次部署后可访问。
-- 自定义域名：`manga-relab.tohsakarat.icu`，已关联到 Pages，等待 DNS 和证书验证。
+- 自定义域名：`manga-relab.tohsakarat.icu`，已关联到 Pages 并配置 DNS；域名验证为 `active`，HTTP 验证为 `pending`。
 - DNS 区域：`tohsakarat.icu`（`2aab827f9d99ace421dd714b689ed42f`）。
 - GitHub 远程仓库：`https://github.com/tohsakarat/manga-relab`，公有，远程名 `origin`。
 
@@ -39,6 +39,8 @@ DNS 记录 ID 为 `27616672a2fbd11acc9af1aaa67f3bbd`。仅添加 CNAME 不足以
 ```bash
 git push -u origin main
 ```
+
+2026-10-14 已完成公有仓库的首次推送，生产源码分支为 `main`。
 
 忽略规则排除 `dist/`、`node_modules/`、`.git/`、`.wrangler/` 和本地环境凭据文件。Git 本身也不会将仓库元数据目录作为普通文件提交。
 
