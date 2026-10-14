@@ -1,6 +1,6 @@
 import { spawn } from 'node:child_process';
 import { resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import chokidar from 'chokidar';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
@@ -53,6 +53,8 @@ export async function startWatcher() {
   });
   await new Promise(resolve => watcher.once('ready', resolve));
   console.log('[watch] Watching source files.');
+  console.log(`[watch] Debug page: ${pathToFileURL(resolve(root, 'index.html')).href}`);
+  console.log('[watch] Refresh the browser after changes. Press Ctrl+C to stop.');
 
   return async function stop() {
     clearTimeout(timer);
