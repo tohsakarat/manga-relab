@@ -386,6 +386,47 @@ button svg {
 .repository-link:hover {
   color: var(--text);
 }
+.style-switcher {
+  display: inline-flex;
+  align-items: center;
+  height: 32px;
+  gap: 2px;
+  padding: 3px;
+  background: var(--bg-subtle);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+}
+.style-option {
+  width: 28px;
+  height: 24px;
+  min-height: 24px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  line-height: 1;
+  transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, transform 0.12s ease;
+}
+.style-option svg {
+  width: 14px;
+  height: 14px;
+  flex: none;
+}
+.style-option:hover:not(:disabled) {
+  color: var(--text);
+  background: color-mix(in srgb, var(--text) 6%, transparent);
+  border-color: transparent;
+}
+.style-option.active {
+  background: var(--panel);
+  color: var(--accent);
+  border-color: var(--accent-border);
+  box-shadow: var(--shadow-sm);
+}
 .accent-switcher {
   display: inline-flex;
   align-items: center;
@@ -2072,6 +2113,12 @@ button svg {
   .theme-toggle {
     padding: 4px 8px;
   }
+  .style-option {
+    width: 25px;
+    height: 22px;
+    min-height: 22px;
+    padding: 0;
+  }
   .home {
     display: block;
     overflow: auto;
@@ -2151,3 +2198,1514 @@ button svg {
     border-bottom: 1px solid var(--line);
   }
 }
+
+/* ============================================================================
+   STYLE A: 漫画原稿纸 · 印前工坊风 (data-style="manuscript")
+   ============================================================================ */
+:root[data-style="manuscript"],
+:root[data-style="manuscript"][data-theme="dark"] {
+  --bg: #111318;
+  --bg-subtle: #171a21;
+  --app-bar-bg: rgba(20, 23, 29, 0.96);
+  --panel: #1b1f27;
+  --panel-hover: #222731;
+  --raised: #252b36;
+  --raised-hover: #2f3644;
+  --surface-well: #0b0d11;
+  --line: #323947;
+  --line-strong: #637089;
+  --ink-hard: #07080a;
+  --ink-shadow: rgba(0, 0, 0, 0.78);
+  --guide-cyan: rgba(56, 189, 248, 0.075);
+  --guide-cyan-strong: rgba(56, 189, 248, 0.18);
+  --halftone-dot: color-mix(in srgb, var(--accent) 28%, transparent);
+  --halftone-subtle: color-mix(in srgb, var(--text) 8%, transparent);
+  --hatch-line: color-mix(in srgb, var(--line-strong) 32%, transparent);
+}
+
+:root[data-style="manuscript"][data-theme="light"] {
+  --bg: #efe9dc;
+  --bg-subtle: #e5decb;
+  --app-bar-bg: rgba(245, 240, 229, 0.97);
+  --panel: #fbf8f1;
+  --panel-hover: #f4efe3;
+  --raised: #ebe4d4;
+  --raised-hover: #dfd6c1;
+  --surface-well: #dcd3be;
+  --text: #161513;
+  --text-secondary: #38352f;
+  --muted: #696255;
+  --line: #c5bba5;
+  --line-strong: #464036;
+  --ink-hard: #1c1915;
+  --ink-shadow: rgba(24, 21, 17, 0.24);
+  --guide-cyan: rgba(14, 165, 233, 0.085);
+  --guide-cyan-strong: rgba(14, 165, 233, 0.22);
+  --halftone-dot: color-mix(in srgb, var(--accent) 24%, transparent);
+  --halftone-subtle: color-mix(in srgb, var(--text) 9%, transparent);
+  --hatch-line: color-mix(in srgb, var(--line-strong) 20%, transparent);
+}
+
+/* Top App Bar with Prepress Millimeter Ruler Scale & Halftone Texture */
+:root[data-style="manuscript"] .app-bar {
+  position: relative;
+  border-bottom: 2px solid var(--line-strong);
+  background-color: var(--app-bar-bg);
+  background-image:
+    repeating-linear-gradient(90deg, var(--line-strong) 0 1px, transparent 1px 40px),
+    repeating-linear-gradient(90deg, var(--line) 0 1px, transparent 1px 8px),
+    radial-gradient(var(--halftone-subtle) 1px, transparent 1.2px);
+  background-size: 40px 6px, 8px 3px, 6px 6px;
+  background-position: 0 100%, 0 100%, 0 0;
+  background-repeat: repeat-x, repeat-x, repeat;
+  box-shadow: 0 3px 0 var(--ink-shadow);
+}
+
+:root[data-style="manuscript"] .brand {
+  gap: 8px;
+}
+
+:root[data-style="manuscript"] .brand strong {
+  position: relative;
+  padding: 4px 12px 4px 10px;
+  border: 1.5px solid var(--line-strong);
+  border-left: 5px solid var(--accent);
+  border-radius: 1px;
+  background-color: var(--panel);
+  background-image: radial-gradient(var(--halftone-dot) 1px, transparent 1.2px);
+  background-size: 5px 5px;
+  box-shadow: 3px 3px 0 var(--ink-shadow);
+  letter-spacing: 0.05em;
+  font-weight: 800;
+}
+
+:root[data-style="manuscript"] .brand .version {
+  border: 1px solid var(--line-strong);
+  padding: 2px 7px;
+  background: var(--bg-subtle);
+  color: var(--text-secondary);
+  font-family: "JetBrains Mono", Consolas, monospace;
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  box-shadow: 2px 2px 0 var(--ink-shadow);
+}
+
+:root[data-style="manuscript"] .brand .version::before {
+  content: "B4 · ";
+  color: var(--accent);
+}
+
+:root[data-style="manuscript"] .style-switcher,
+:root[data-style="manuscript"] .accent-switcher,
+:root[data-style="manuscript"] .theme-toggle {
+  border-radius: 2px;
+  border: 1.5px solid var(--line-strong);
+  background: var(--panel);
+  box-shadow: 2.5px 2.5px 0 var(--ink-shadow);
+}
+
+:root[data-style="manuscript"] .style-option {
+  border-radius: 1px;
+}
+
+:root[data-style="manuscript"] .style-option.active {
+  background: var(--accent);
+  color: var(--accent-contrast);
+  border-color: var(--line-strong);
+  box-shadow: 1.5px 1.5px 0 var(--ink-shadow);
+}
+
+/* Non-Photo Blue (水色原稿框线) Grid on Home & Editor Sidebar */
+:root[data-style="manuscript"] .home {
+  background-color: var(--bg);
+  background-image:
+    linear-gradient(var(--guide-cyan) 1px, transparent 1px),
+    linear-gradient(90deg, var(--guide-cyan) 1px, transparent 1px),
+    linear-gradient(var(--guide-cyan-strong) 1px, transparent 1px),
+    linear-gradient(90deg, var(--guide-cyan-strong) 1px, transparent 1px);
+  background-size: 20px 20px, 20px 20px, 100px 100px, 100px 100px;
+}
+
+:root[data-style="manuscript"] .column-splitter::before {
+  left: 1px;
+  width: 5px;
+  background: repeating-linear-gradient(
+    -45deg,
+    var(--line-strong) 0 1.5px,
+    transparent 1.5px 4px
+  );
+  border-left: 1.5px solid var(--line-strong);
+  border-right: 1.5px solid var(--line-strong);
+}
+
+/* Manga Manuscript Sheet Header (原稿整理票) */
+:root[data-style="manuscript"] .column-heading {
+  position: relative;
+  border-bottom: 2px solid var(--line-strong);
+  background-color: var(--panel);
+  background-image:
+    linear-gradient(105deg, var(--panel) 48%, transparent 88%),
+    repeating-linear-gradient(-45deg, var(--hatch-line) 0 1px, transparent 1px 5px),
+    radial-gradient(var(--halftone-dot) 1.25px, transparent 1.4px);
+  background-size: 100% 100%, 100% 100%, 6px 6px;
+  box-shadow: inset 0 -3px 0 var(--bg-subtle), 0 2px 0 var(--ink-shadow);
+  padding: 15px 18px 15px 16px;
+}
+
+:root[data-style="manuscript"] .column-heading::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 4px;
+  background: repeating-linear-gradient(90deg, var(--line-strong) 0 1px, transparent 1px 6px);
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+:root[data-style="manuscript"] .home-column:nth-of-type(1) .column-heading h2::before {
+  content: "CUT.01";
+}
+:root[data-style="manuscript"] .home-column:nth-of-type(2) .column-heading h2::before {
+  content: "CUT.02";
+}
+:root[data-style="manuscript"] .home-column:nth-of-type(3) .column-heading h2::before {
+  content: "CUT.03";
+}
+:root[data-style="manuscript"] .home-column .column-heading h2::before {
+  font: 800 10px/1 "JetBrains Mono", Consolas, monospace;
+  padding: 4px 6px;
+  border: 1.5px solid var(--line-strong);
+  background: var(--accent);
+  color: var(--accent-contrast);
+  letter-spacing: 0.06em;
+  box-shadow: 2px 2px 0 var(--ink-shadow);
+}
+
+:root[data-style="manuscript"] .column-heading h2 {
+  font-weight: 800;
+  letter-spacing: 0.03em;
+}
+
+:root[data-style="manuscript"] .counter {
+  border-radius: 1px;
+  border: 1.5px solid var(--line-strong);
+  background: var(--bg-subtle);
+  color: var(--text);
+  font-family: "JetBrains Mono", Consolas, monospace;
+  font-weight: 800;
+  padding: 1px 8px;
+  box-shadow: 2px 2px 0 var(--ink-shadow);
+}
+
+/* Tactile Ink-Press Buttons & Controls */
+:root[data-style="manuscript"] :where(.app-bar, .home, .editor-sidebar, .node-popup, .script-editor, .context-menu) :is(button, input:not([type="range"]):not([type="checkbox"]), select, textarea) {
+  border-radius: 2px;
+  border-color: var(--line-strong);
+}
+
+:root[data-style="manuscript"] :where(.home, .editor-sidebar, .node-popup, .script-editor) :is(input:not([type="range"]):not([type="checkbox"]), select, textarea) {
+  border-width: 1.5px;
+  background-color: var(--surface-well);
+  box-shadow: inset 2px 2px 0 rgba(0, 0, 0, 0.18);
+}
+
+:root[data-style="manuscript"] :where(.home, .editor-sidebar, .node-popup, .script-editor) .button {
+  border-radius: 2px;
+  border: 1.5px solid var(--line-strong);
+  background-color: var(--panel);
+  font-weight: 650;
+  box-shadow: 2.5px 2.5px 0 var(--ink-shadow);
+  transition: transform 0.1s ease, box-shadow 0.1s ease, background-color 0.12s ease;
+}
+
+:root[data-style="manuscript"] :where(.home, .editor-sidebar, .node-popup, .script-editor) .button:hover:not(:disabled) {
+  transform: translate(-1px, -1px);
+  background-color: var(--raised);
+  border-color: var(--accent);
+  box-shadow: 3.5px 3.5px 0 var(--ink-shadow);
+}
+
+:root[data-style="manuscript"] :where(.home, .editor-sidebar, .node-popup, .script-editor) .button:active:not(:disabled) {
+  transform: translate(1.5px, 1.5px);
+  box-shadow: 1px 1px 0 var(--ink-shadow);
+}
+
+:root[data-style="manuscript"] :where(.home, .editor-sidebar, .node-popup, .script-editor) .button.primary {
+  background-color: var(--accent);
+  background-image: repeating-linear-gradient(
+    -45deg,
+    rgba(255, 255, 255, 0.08) 0 2px,
+    transparent 2px 6px
+  );
+  color: var(--accent-contrast);
+  border: 1.5px solid var(--line-strong);
+  box-shadow: 3px 3px 0 var(--ink-shadow);
+}
+
+:root[data-style="manuscript"] :where(.home, .editor-sidebar, .node-popup, .script-editor) .icon-button {
+  border-radius: 2px;
+  border: 1px solid transparent;
+}
+
+:root[data-style="manuscript"] :where(.home, .editor-sidebar, .node-popup, .script-editor) .icon-button:hover:not(:disabled) {
+  border-color: var(--line-strong);
+  background: var(--raised);
+  box-shadow: 2px 2px 0 var(--ink-shadow);
+}
+
+/* Stacked Manuscript Cards with Registration Marks (トンボ) & Screentone Strip */
+:root[data-style="manuscript"] .item {
+  position: relative;
+  border-radius: 2px;
+  border: 1.5px solid var(--line-strong);
+  background-color: var(--panel);
+  margin-bottom: 18px;
+  /* Multi-sheet stacked paper shadow */
+  box-shadow:
+    3px 3px 0 var(--bg-subtle),
+    4.5px 4.5px 0 var(--line-strong),
+    7px 7px 0 var(--ink-shadow);
+  /* 4-corner prepress crop marks (トンボ) + top-right screentone tab */
+  background-image:
+    linear-gradient(to right, var(--accent) 8px, transparent 8px),
+    linear-gradient(to bottom, var(--accent) 8px, transparent 8px),
+    linear-gradient(to left, var(--line-strong) 8px, transparent 8px),
+    linear-gradient(to top, var(--line-strong) 8px, transparent 8px),
+    linear-gradient(to left, var(--line-strong) 8px, transparent 8px),
+    linear-gradient(to bottom, var(--line-strong) 8px, transparent 8px),
+    linear-gradient(to right, var(--line-strong) 8px, transparent 8px),
+    linear-gradient(to top, var(--line-strong) 8px, transparent 8px);
+  background-position:
+    4px 4px, 4px 4px,
+    calc(100% - 4px) calc(100% - 4px), calc(100% - 4px) calc(100% - 4px),
+    calc(100% - 4px) 4px, calc(100% - 4px) 4px,
+    4px calc(100% - 4px), 4px calc(100% - 4px);
+  background-size:
+    10px 1.5px, 1.5px 10px,
+    10px 1.5px, 1.5px 10px,
+    10px 1.5px, 1.5px 10px,
+    10px 1.5px, 1.5px 10px;
+  background-repeat: no-repeat;
+}
+
+:root[data-style="manuscript"] .item:hover {
+  border-color: var(--accent);
+  transform: translate(-1px, -1px);
+  box-shadow:
+    3px 3px 0 var(--panel),
+    5px 5px 0 var(--accent),
+    8px 8px 0 var(--ink-shadow);
+}
+
+:root[data-style="manuscript"] .item.active {
+  border-color: var(--accent);
+  box-shadow:
+    3px 3px 0 var(--accent-soft),
+    5px 5px 0 var(--accent),
+    8px 8px 0 var(--ink-shadow);
+}
+
+:root[data-style="manuscript"] .item-head {
+  padding: 13px 15px 11px;
+  border-bottom: 1px solid var(--line);
+  background-image:
+    linear-gradient(90deg, var(--panel) 50%, transparent 100%),
+    radial-gradient(var(--halftone-subtle) 1px, transparent 1.3px);
+  background-size: 100% 100%, 5px 5px;
+}
+
+:root[data-style="manuscript"] .item.active > .item-head {
+  border-bottom-color: var(--accent-border);
+  background-image:
+    linear-gradient(90deg, var(--panel) 45%, transparent 100%),
+    radial-gradient(var(--halftone-dot) 1.2px, transparent 1.4px);
+  background-size: 100% 100%, 5px 5px;
+}
+
+/* Rubber Stamp (印章) Item Icon */
+:root[data-style="manuscript"] .item-icon {
+  border-radius: 2px;
+  border: 1.5px solid var(--line-strong);
+  outline: 1px solid var(--line);
+  outline-offset: -4px;
+  background: var(--bg-subtle);
+  color: var(--text);
+  box-shadow: 2px 2px 0 var(--ink-shadow);
+}
+
+:root[data-style="manuscript"] .item-icon.pipeline,
+:root[data-style="manuscript"] .item.active .item-icon {
+  border-color: var(--accent);
+  outline-color: var(--accent-border);
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+:root[data-style="manuscript"] .item-name {
+  font-weight: 750;
+  letter-spacing: 0.01em;
+}
+
+/* Typesetting Strips (写植贴条) Metadata Tags */
+:root[data-style="manuscript"] .item-details {
+  padding: 10px 15px 11px;
+  gap: 6px;
+}
+
+:root[data-style="manuscript"] .item-details > span {
+  font-family: "JetBrains Mono", Consolas, monospace;
+  font-size: 11px;
+  padding: 2px 7px;
+  background: var(--bg-subtle);
+  border: 1px solid var(--line);
+  color: var(--text-secondary);
+  box-shadow: 1px 1px 0 var(--ink-shadow);
+}
+
+/* Diagonal Hatch Action Bar */
+:root[data-style="manuscript"] .item-tools {
+  border-top: 1.5px solid var(--line-strong);
+  background-color: var(--bg-subtle);
+  background-image: repeating-linear-gradient(
+    -45deg,
+    var(--hatch-line) 0 1px,
+    transparent 1px 6px
+  );
+  padding: 9px 12px;
+}
+
+:root[data-style="manuscript"] .item-expanded {
+  border-top: 1.5px dashed var(--line-strong);
+  background-color: var(--panel);
+  background-image:
+    linear-gradient(var(--guide-cyan) 1px, transparent 1px),
+    linear-gradient(90deg, var(--guide-cyan) 1px, transparent 1px);
+  background-size: 16px 16px;
+}
+
+/* Manuscript Cut Frames for Image Thumbnails */
+:root[data-style="manuscript"] .file-card {
+  border-radius: 1px;
+  border: 1.5px solid var(--line-strong);
+  background: var(--panel);
+  padding: 4px;
+  box-shadow: 2.5px 2.5px 0 var(--ink-shadow);
+}
+
+:root[data-style="manuscript"] .file-thumbnail {
+  border: 1px solid var(--line-strong);
+  background-color: var(--surface-well);
+  background-image: radial-gradient(var(--halftone-subtle) 1px, transparent 1.2px);
+  background-size: 6px 6px;
+}
+
+:root[data-style="manuscript"] .file-caption {
+  border-top: 1px dashed var(--line-strong);
+  margin-top: 4px;
+  padding: 6px 4px 2px;
+  font-family: "JetBrains Mono", Consolas, monospace;
+}
+
+:root[data-style="manuscript"] .file-state {
+  border-radius: 1px;
+  transform: rotate(45deg);
+  border: 1px solid var(--line-strong);
+}
+
+:root[data-style="manuscript"] .empty {
+  border-radius: 2px;
+  border: 2px dashed var(--line-strong);
+  background-color: var(--panel);
+  background-image:
+    radial-gradient(var(--halftone-subtle) 1.2px, transparent 1.4px);
+  background-size: 7px 7px;
+  box-shadow: inset 0 0 0 4px var(--bg-subtle), 3px 3px 0 var(--ink-shadow);
+}
+
+:root[data-style="manuscript"] .preset-button {
+  border-radius: 2px;
+  border: 2px dashed var(--accent);
+  background-color: var(--panel);
+  background-image: radial-gradient(var(--halftone-dot) 1.2px, transparent 1.4px);
+  background-size: 6px 6px;
+  font-weight: 700;
+  box-shadow: 3px 3px 0 var(--ink-shadow);
+}
+
+/* Studio Inspection Stamp (検印) Status Badge */
+:root[data-style="manuscript"] .status,
+:root[data-style="manuscript"] .editor-status {
+  border-radius: 1px;
+  border: 1.5px solid currentColor;
+  outline: 1px solid currentColor;
+  outline-offset: -3px;
+  padding: 2px 9px;
+  font-family: "JetBrains Mono", Consolas, monospace;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  box-shadow: 2px 2px 0 var(--ink-shadow);
+}
+
+/* Screentone Gauge Progress Bar */
+:root[data-style="manuscript"] .task-progress {
+  padding: 8px 15px 12px;
+}
+
+:root[data-style="manuscript"] .progress-track,
+:root[data-style="manuscript"] .trial-progress {
+  height: 10px;
+  border-radius: 1px;
+  border: 1.5px solid var(--line-strong);
+  background-color: var(--surface-well);
+  background-image:
+    repeating-linear-gradient(90deg, var(--line) 0 1px, transparent 1px 10px),
+    radial-gradient(var(--halftone-subtle) 1px, transparent 1px);
+  background-size: 10px 100%, 4px 4px;
+  box-shadow: inset 1px 1px 0 rgba(0, 0, 0, 0.35);
+}
+
+:root[data-style="manuscript"] .progress-fill {
+  border-radius: 0;
+  background-color: var(--accent);
+  background-image: repeating-linear-gradient(
+    -45deg,
+    rgba(255, 255, 255, 0.24) 0 3px,
+    transparent 3px 6px
+  );
+  border-right: 2px solid var(--line-strong);
+}
+
+/* Editor Sidebar & Comic Panel Frame Preview */
+:root[data-style="manuscript"] .editor-sidebar {
+  background-color: var(--panel);
+  background-image:
+    linear-gradient(var(--guide-cyan) 1px, transparent 1px),
+    linear-gradient(90deg, var(--guide-cyan) 1px, transparent 1px);
+  background-size: 20px 20px;
+  border-left: 2px solid var(--line-strong);
+}
+
+:root[data-style="manuscript"] .sidebar-section {
+  border: 1.5px solid var(--line-strong);
+  background: var(--panel);
+  padding: 12px;
+  margin-bottom: 14px;
+  box-shadow: 3px 3px 0 var(--ink-shadow);
+}
+
+:root[data-style="manuscript"] .sidebar-section:last-child {
+  border: 1.5px solid var(--line-strong);
+  margin-bottom: 0;
+}
+
+:root[data-style="manuscript"] .sidebar-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text);
+  font-weight: 800;
+  padding-bottom: 7px;
+  margin-bottom: 10px;
+  border-bottom: 1.5px solid var(--line-strong);
+  background-image: radial-gradient(var(--halftone-dot) 1px, transparent 1.2px);
+  background-size: 5px 5px;
+}
+
+:root[data-style="manuscript"] .sidebar-title::before {
+  content: "■";
+  color: var(--accent);
+  font-size: 10px;
+}
+
+:root[data-style="manuscript"] .preview-surface,
+:root[data-style="manuscript"] .popup-preview,
+:root[data-style="manuscript"] .curve-canvas {
+  border-radius: 1px;
+  border: 2px solid var(--line-strong);
+  outline: 1px solid var(--line-strong);
+  outline-offset: 2px;
+  box-shadow: 4px 4px 0 var(--ink-shadow);
+}
+
+:root[data-style="manuscript"] .node-popup,
+:root[data-style="manuscript"] .script-editor,
+:root[data-style="manuscript"] .context-menu,
+:root[data-style="manuscript"] .toast {
+  border-radius: 2px;
+  border: 2px solid var(--line-strong);
+  box-shadow:
+    4px 4px 0 var(--bg-subtle),
+    6px 6px 0 var(--line-strong),
+    9px 9px 0 var(--ink-shadow);
+}
+
+/* ============================================================================
+   STYLE C: 现代画册 · 开放式排印目录风 (data-style="editorial")
+   ============================================================================ */
+:root[data-style="editorial"],
+:root[data-style="editorial"][data-theme="dark"] {
+  --bg: #121210;
+  --bg-subtle: #191916;
+  --app-bar-bg: rgba(18, 18, 16, 0.95);
+  --panel: #161613;
+  --panel-hover: #1e1e1a;
+  --raised: #23231e;
+  --raised-hover: #2c2c26;
+  --surface-well: #0b0b09;
+  --text: #f3f0e8;
+  --text-secondary: #c7c2b6;
+  --muted: #858074;
+  --line: rgba(243, 240, 232, 0.11);
+  --line-strong: rgba(243, 240, 232, 0.28);
+  --editorial-rule: rgba(243, 240, 232, 0.72);
+  --editorial-serif: "Noto Serif SC", "Source Han Serif SC", "Songti SC", Georgia, "Times New Roman", serif;
+}
+
+:root[data-style="editorial"][data-theme="light"] {
+  --bg: #f7f4ed;
+  --bg-subtle: #ede8dd;
+  --app-bar-bg: rgba(247, 244, 237, 0.96);
+  --panel: #fbf9f4;
+  --panel-hover: #f1ede3;
+  --raised: #e7e1d4;
+  --raised-hover: #dcd4c4;
+  --surface-well: #e2dac9;
+  --text: #151412;
+  --text-secondary: #3d3a34;
+  --muted: #767065;
+  --line: rgba(21, 20, 18, 0.11);
+  --line-strong: rgba(21, 20, 18, 0.28);
+  --editorial-rule: #151412;
+  --editorial-serif: "Noto Serif SC", "Source Han Serif SC", "Songti SC", Georgia, "Times New Roman", serif;
+}
+
+/* Magazine Masthead App Bar with Classic Double Rule */
+:root[data-style="editorial"] .app-bar {
+  border-top: 3px solid var(--editorial-rule);
+  border-bottom: 1px solid var(--editorial-rule);
+  box-shadow: inset 0 -3px 0 var(--bg), inset 0 -4px 0 var(--line-strong);
+  background: var(--app-bar-bg);
+}
+
+:root[data-style="editorial"] .brand {
+  gap: 12px;
+}
+
+:root[data-style="editorial"] .brand strong {
+  font-family: var(--editorial-serif);
+  font-size: 17px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+
+:root[data-style="editorial"] .brand .version {
+  border-left: 1px solid var(--line-strong);
+  padding-left: 12px;
+  font-family: "JetBrains Mono", Consolas, monospace;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+:root[data-style="editorial"] .brand .version::before {
+  content: "CATALOGUE // ";
+  color: var(--accent);
+  font-weight: 700;
+}
+
+:root[data-style="editorial"] .style-switcher,
+:root[data-style="editorial"] .accent-switcher,
+:root[data-style="editorial"] .theme-toggle {
+  border-radius: 0;
+  background: transparent;
+  border: 1px solid var(--line-strong);
+}
+
+:root[data-style="editorial"] .style-option {
+  border-radius: 0;
+}
+
+:root[data-style="editorial"] .style-option.active {
+  background: var(--text);
+  color: var(--bg);
+  border-color: var(--text);
+  box-shadow: inset 0 -2px 0 var(--accent);
+}
+
+/* Swiss Grid Architecture & Column Dividers */
+:root[data-style="editorial"] .home {
+  background-color: var(--bg);
+  background-image:
+    linear-gradient(90deg, var(--line) 1px, transparent 1px),
+    linear-gradient(var(--line) 1px, transparent 1px);
+  background-size: 64px 64px;
+}
+
+:root[data-style="editorial"] .column-splitter::before {
+  left: 2px;
+  width: 3px;
+  background: transparent;
+  border-left: 1px solid var(--editorial-rule);
+  border-right: 1px solid var(--line-strong);
+}
+
+/* Artbook Chapter Opener Column Headings with Oversized Serif Watermark */
+:root[data-style="editorial"] .column-heading {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(180deg, var(--bg-subtle) 0%, var(--bg) 100%);
+  border-bottom: 2px solid var(--editorial-rule);
+  box-shadow: inset 0 -4px 0 var(--bg), inset 0 -5px 0 var(--line-strong);
+  margin: 0;
+  padding: 24px 22px 14px;
+  min-height: 74px;
+}
+
+:root[data-style="editorial"] .column-heading::before {
+  position: absolute;
+  top: 7px;
+  left: 22px;
+  font: 600 9px/1 "JetBrains Mono", Consolas, monospace;
+  letter-spacing: 0.18em;
+  color: var(--accent);
+  text-transform: uppercase;
+}
+
+:root[data-style="editorial"] .home-column:nth-of-type(1) .column-heading::before {
+  content: "CH. I — SOURCE ARCHIVE";
+}
+:root[data-style="editorial"] .home-column:nth-of-type(2) .column-heading::before {
+  content: "CH. II — PROCESS CURATION";
+}
+:root[data-style="editorial"] .home-column:nth-of-type(3) .column-heading::before {
+  content: "CH. III — EDITION QUEUE";
+}
+
+:root[data-style="editorial"] .column-heading::after {
+  position: absolute;
+  right: 14px;
+  bottom: -14px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-style: italic;
+  font-weight: 700;
+  font-size: 64px;
+  line-height: 1;
+  color: var(--text);
+  opacity: 0.06;
+  pointer-events: none;
+}
+
+:root[data-style="editorial"] .home-column:nth-of-type(1) .column-heading::after {
+  content: "I";
+}
+:root[data-style="editorial"] .home-column:nth-of-type(2) .column-heading::after {
+  content: "II";
+}
+:root[data-style="editorial"] .home-column:nth-of-type(3) .column-heading::after {
+  content: "III";
+}
+
+:root[data-style="editorial"] .column-heading h2 {
+  font-family: var(--editorial-serif);
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+:root[data-style="editorial"] .column-heading h2 svg {
+  display: none;
+}
+
+:root[data-style="editorial"] .counter {
+  background: transparent;
+  border: 0;
+  border-bottom: 1.5px solid var(--accent);
+  border-radius: 0;
+  padding: 0 2px;
+  min-width: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-style: italic;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+:root[data-style="editorial"] .counter::before {
+  content: "No. ";
+  font-size: 11px;
+  color: var(--muted);
+}
+
+/* Dedicated Swiss Index Gutter in Column Body */
+:root[data-style="editorial"] .column-body {
+  padding: 0 22px 32px;
+  counter-reset: editorial-item;
+  background-image: linear-gradient(
+    90deg,
+    transparent 0 58px,
+    var(--line-strong) 58px 59px,
+    transparent 59px 100%
+  );
+}
+
+/* Exhibition Catalog Spread Entry */
+:root[data-style="editorial"] .item {
+  position: relative;
+  counter-increment: editorial-item;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid var(--line-strong);
+  border-radius: 0;
+  margin-bottom: 0;
+  padding: 10px 0 12px;
+  box-shadow: none;
+  transition: background-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+/* Crosshair tick at intersection of gutter & row border */
+:root[data-style="editorial"] .item::after {
+  content: "+";
+  position: absolute;
+  left: 33px;
+  bottom: -7px;
+  font: 400 11px/1 "JetBrains Mono", Consolas, monospace;
+  color: var(--muted);
+  pointer-events: none;
+}
+
+:root[data-style="editorial"] .item:hover {
+  background: linear-gradient(90deg, color-mix(in srgb, var(--text) 5%, transparent) 0%, transparent 100%);
+  box-shadow: inset 3px 0 0 var(--editorial-rule);
+}
+
+:root[data-style="editorial"] .item.active {
+  background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 8%, transparent) 0%, color-mix(in srgb, var(--accent) 2%, transparent) 100%);
+  box-shadow: inset 4px 0 0 var(--accent);
+}
+
+:root[data-style="editorial"] .item-head {
+  padding: 8px 10px 6px 0;
+  gap: 14px;
+  align-items: baseline;
+}
+
+/* Large Serif Italic Index Numeral in the Left Gutter */
+:root[data-style="editorial"] .item-head::before {
+  content: counter(editorial-item, decimal-leading-zero);
+  font-family: Georgia, "Times New Roman", serif;
+  font-style: italic;
+  font-weight: 700;
+  font-size: 20px;
+  line-height: 1;
+  color: var(--accent);
+  width: 36px;
+  min-width: 36px;
+  text-align: right;
+  padding-right: 10px;
+  flex: none;
+}
+
+:root[data-style="editorial"] .item-icon {
+  display: none;
+}
+
+:root[data-style="editorial"] .item-name {
+  font-family: var(--editorial-serif);
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+/* Museum Artwork Plaque Metadata Row */
+:root[data-style="editorial"] .item-details {
+  padding: 2px 10px 10px 50px;
+  font-family: "JetBrains Mono", Consolas, monospace;
+  font-size: 11px;
+  letter-spacing: 0.03em;
+  gap: 0;
+}
+
+:root[data-style="editorial"] .item-details > span {
+  padding: 1px 8px;
+  border-left: 1px solid var(--line-strong);
+  color: var(--text-secondary);
+}
+
+:root[data-style="editorial"] .item-details > span:first-child {
+  padding-left: 0;
+  border-left: 0;
+  color: var(--muted);
+}
+
+:root[data-style="editorial"] .item-tools {
+  background: transparent;
+  border-top: 1px dashed var(--line);
+  margin-left: 50px;
+  padding: 8px 6px 2px 0;
+}
+
+:root[data-style="editorial"] .item-expanded {
+  background: var(--panel);
+  border: 1px solid var(--line-strong);
+  border-left: 3px solid var(--accent);
+  margin: 8px 4px 10px 50px;
+  padding: 16px;
+  box-shadow: 0 8px 24px -10px rgba(0, 0, 0, 0.25);
+}
+
+:root[data-style="editorial"] .task-progress {
+  padding: 4px 8px 10px 50px;
+}
+
+:root[data-style="editorial"] .progress-top {
+  font-family: "JetBrains Mono", Consolas, monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+:root[data-style="editorial"] .progress-track,
+:root[data-style="editorial"] .trial-progress {
+  height: 4px;
+  border-radius: 0;
+  background: var(--line-strong);
+}
+
+:root[data-style="editorial"] .progress-fill {
+  border-radius: 0;
+  background: var(--accent);
+}
+
+:root[data-style="editorial"] .status,
+:root[data-style="editorial"] .editor-status {
+  border-radius: 0;
+  border: 1px solid currentColor;
+  background: transparent;
+  padding: 2px 7px;
+  font-family: "JetBrains Mono", Consolas, monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Editorial Form Controls & Gallery Buttons */
+:root[data-style="editorial"] :where(.home, .editor-sidebar, .node-popup, .script-editor) :is(input:not([type="range"]):not([type="checkbox"]), select, textarea) {
+  border: 0;
+  border-bottom: 1.5px solid var(--line-strong);
+  border-radius: 0;
+  background: color-mix(in srgb, var(--text) 4%, transparent);
+  padding-inline: 8px;
+}
+
+:root[data-style="editorial"] :where(.home, .editor-sidebar, .node-popup, .script-editor) :is(input:not([type="range"]):not([type="checkbox"]), select, textarea):focus-visible {
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+  box-shadow: 0 1.5px 0 0 var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+:root[data-style="editorial"] :where(.home, .editor-sidebar, .node-popup, .script-editor) .button {
+  border-radius: 0;
+  background: var(--panel);
+  border: 1px solid var(--line-strong);
+  font-size: 12px;
+  letter-spacing: 0.03em;
+  box-shadow: none;
+}
+
+:root[data-style="editorial"] :where(.home, .editor-sidebar, .node-popup, .script-editor) .button:hover:not(:disabled) {
+  background: var(--text);
+  color: var(--bg);
+  border-color: var(--text);
+}
+
+:root[data-style="editorial"] :where(.home, .editor-sidebar, .node-popup, .script-editor) .button.primary {
+  background: var(--text);
+  color: var(--bg);
+  border-color: var(--text);
+  box-shadow: inset 4px 0 0 var(--accent);
+  font-weight: 700;
+}
+
+:root[data-style="editorial"] :where(.home, .editor-sidebar, .node-popup, .script-editor) .button.primary:hover:not(:disabled) {
+  background: var(--accent);
+  color: var(--accent-contrast);
+  border-color: var(--accent);
+  box-shadow: inset 4px 0 0 var(--text);
+}
+
+:root[data-style="editorial"] :where(.home, .editor-sidebar, .node-popup, .script-editor) .icon-button {
+  border-radius: 0;
+}
+
+/* Mounted Artbook Plates for File Thumbnails */
+:root[data-style="editorial"] .file-list {
+  counter-reset: editorial-plate;
+  gap: 14px;
+}
+
+:root[data-style="editorial"] .file-card {
+  counter-increment: editorial-plate;
+  border: 1px solid var(--line-strong);
+  border-radius: 0;
+  background: var(--bg-subtle);
+  padding: 8px 8px 6px;
+}
+
+:root[data-style="editorial"] .file-thumbnail {
+  border: 1px solid var(--line);
+  background: var(--surface-well);
+}
+
+:root[data-style="editorial"] .file-caption {
+  background: transparent;
+  border-top: 0;
+  padding: 8px 2px 2px;
+  font-family: "JetBrains Mono", Consolas, monospace;
+}
+
+:root[data-style="editorial"] .file-caption .path::before {
+  content: "FIG." counter(editorial-plate, decimal-leading-zero) " — ";
+  font-family: Georgia, "Times New Roman", serif;
+  font-style: italic;
+  color: var(--accent);
+}
+
+:root[data-style="editorial"] .empty {
+  border: 1px solid var(--line-strong);
+  border-left: 3px solid var(--editorial-rule);
+  border-radius: 0;
+  margin-left: 50px;
+  margin-top: 14px;
+  background: linear-gradient(135deg, var(--bg-subtle) 0%, transparent 100%);
+  font-family: var(--editorial-serif);
+}
+
+:root[data-style="editorial"] .preset-button {
+  width: calc(100% - 50px);
+  margin-left: 50px;
+  border-radius: 0;
+  border: 1px solid var(--editorial-rule);
+  box-shadow: inset 4px 0 0 var(--accent);
+  margin-top: 18px;
+  background: var(--bg-subtle);
+  color: var(--text);
+  font-family: var(--editorial-serif);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+/* Editor Sidebar Catalog Sections */
+:root[data-style="editorial"] .editor-sidebar {
+  background: var(--bg);
+  border-left: 1px solid var(--editorial-rule);
+  counter-reset: editorial-sec;
+}
+
+:root[data-style="editorial"] .sidebar-section {
+  counter-increment: editorial-sec;
+  border-bottom: 1px solid var(--line-strong);
+  padding-bottom: 18px;
+  margin-bottom: 18px;
+}
+
+:root[data-style="editorial"] .sidebar-title {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  font-family: var(--editorial-serif);
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--text);
+  border-top: 2px solid var(--editorial-rule);
+  padding-top: 8px;
+  margin-bottom: 12px;
+}
+
+:root[data-style="editorial"] .sidebar-title::after {
+  content: "SEC. 0" counter(editorial-sec);
+  font: 600 10px/1 "JetBrains Mono", Consolas, monospace;
+  color: var(--accent);
+  letter-spacing: 0.1em;
+}
+
+:root[data-style="editorial"] .preview-surface,
+:root[data-style="editorial"] .popup-preview {
+  border-radius: 0;
+  border: 1px solid var(--editorial-rule);
+  padding: 6px;
+  background: var(--bg-subtle);
+  box-shadow: inset 0 0 0 6px var(--panel);
+}
+
+:root[data-style="editorial"] .curve-canvas,
+:root[data-style="editorial"] .node-popup,
+:root[data-style="editorial"] .script-editor,
+:root[data-style="editorial"] .context-menu,
+:root[data-style="editorial"] .toast {
+  border-radius: 0;
+  border: 1.5px solid var(--editorial-rule);
+}
+
+/* ============================================================================
+   STYLE D: 光学暗房 · 透光看片台风 (data-style="darkroom")
+   ============================================================================ */
+:root[data-style="darkroom"],
+:root[data-style="darkroom"][data-theme="dark"] {
+  --bg: #05070b;
+  --bg-subtle: #090d14;
+  --app-bar-bg: rgba(9, 13, 20, 0.92);
+  --panel: #0e141e;
+  --panel-hover: #131b28;
+  --raised: #172131;
+  --raised-hover: #1f2c40;
+  --surface-well: #030407;
+  --line: rgba(148, 163, 184, 0.14);
+  --line-strong: rgba(148, 163, 184, 0.3);
+  --specular-top: rgba(255, 255, 255, 0.13);
+  --bezel-inner: rgba(255, 255, 255, 0.05);
+  --film-hole: rgba(255, 255, 255, 0.22);
+}
+
+:root[data-style="darkroom"][data-theme="light"] {
+  --bg: #dde6f2;
+  --bg-subtle: #d2deed;
+  --app-bar-bg: rgba(232, 239, 249, 0.94);
+  --panel: #eef4fc;
+  --panel-hover: #f7faff;
+  --raised: #dfe9f6;
+  --raised-hover: #cfddf0;
+  --surface-well: #c2d1e6;
+  --line: rgba(30, 41, 59, 0.14);
+  --line-strong: rgba(30, 41, 59, 0.28);
+  --specular-top: rgba(255, 255, 255, 0.92);
+  --bezel-inner: rgba(255, 255, 255, 0.65);
+  --film-hole: rgba(15, 23, 42, 0.3);
+}
+
+/* CNC Anodized Metal Console Top Plate */
+:root[data-style="darkroom"] .app-bar {
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--raised) 85%, transparent) 0%, var(--app-bar-bg) 100%);
+  border-bottom: 1px solid var(--line-strong);
+  box-shadow:
+    inset 0 1px 0 var(--specular-top),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.45),
+    0 6px 24px rgba(0, 0, 0, 0.32);
+}
+
+:root[data-style="darkroom"] .brand strong {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 11px;
+  border-radius: 4px;
+  background: var(--surface-well);
+  border: 1px solid var(--line-strong);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.45), 0 1px 0 var(--specular-top);
+  letter-spacing: 0.04em;
+}
+
+:root[data-style="darkroom"] .brand strong::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 8px var(--accent), 0 0 14px var(--accent-glow);
+}
+
+:root[data-style="darkroom"] .brand .version {
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  padding: 2px 7px;
+  background: var(--surface-well);
+  color: var(--accent);
+  font-family: "JetBrains Mono", Consolas, monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-shadow: 0 0 8px var(--accent-glow);
+}
+
+:root[data-style="darkroom"] .brand .version::before {
+  content: "LOUPE // ";
+  color: var(--muted);
+  text-shadow: none;
+}
+
+:root[data-style="darkroom"] .style-switcher,
+:root[data-style="darkroom"] .accent-switcher,
+:root[data-style="darkroom"] .theme-toggle {
+  border-radius: 4px;
+  background: var(--surface-well);
+  border: 1px solid var(--line-strong);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4), 0 1px 0 var(--specular-top);
+}
+
+:root[data-style="darkroom"] .style-option {
+  border-radius: 3px;
+}
+
+:root[data-style="darkroom"] .style-option.active {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 28%, var(--panel)), var(--accent-soft));
+  color: var(--accent);
+  border-color: var(--accent);
+  box-shadow: 0 0 12px var(--accent-glow), inset 0 1px 0 var(--specular-top);
+}
+
+/* Backlit Light-Table Glow & Precision Optical Reticle Grid */
+:root[data-style="darkroom"] .home {
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(ellipse 80% 48% at 50% -6%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 70%),
+    radial-gradient(circle at center, var(--line-strong) 1px, transparent 1px),
+    linear-gradient(var(--line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  background-size: 100% 100%, 32px 32px, 128px 128px, 128px 128px;
+}
+
+:root[data-style="darkroom"] .column-splitter::before {
+  left: 2px;
+  width: 4px;
+  background: var(--surface-well);
+  border-left: 1px solid var(--line-strong);
+  border-right: 1px solid var(--specular-top);
+}
+
+/* Optical Instrument Channel Header */
+:root[data-style="darkroom"] .column-heading {
+  position: relative;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--raised) 78%, var(--panel)) 0%, var(--bg-subtle) 100%);
+  border-bottom: 1px solid var(--line-strong);
+  box-shadow:
+    inset 0 1px 0 var(--specular-top),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.4),
+    0 4px 14px -4px rgba(0, 0, 0, 0.35);
+  padding: 20px 18px 12px;
+}
+
+:root[data-style="darkroom"] .column-heading::before {
+  position: absolute;
+  top: 5px;
+  left: 18px;
+  font: 600 9px/1 "JetBrains Mono", Consolas, monospace;
+  letter-spacing: 0.14em;
+  color: var(--accent);
+  text-shadow: 0 0 8px var(--accent-glow);
+}
+
+:root[data-style="darkroom"] .home-column:nth-of-type(1) .column-heading::before {
+  content: "● CH-01 // NEGATIVE ROLLS";
+}
+:root[data-style="darkroom"] .home-column:nth-of-type(2) .column-heading::before {
+  content: "● CH-02 // OPTICAL CHAIN";
+}
+:root[data-style="darkroom"] .home-column:nth-of-type(3) .column-heading::before {
+  content: "● CH-03 // EXPOSURE QUEUE";
+}
+
+:root[data-style="darkroom"] .counter,
+:root[data-style="darkroom"] .status,
+:root[data-style="darkroom"] .editor-status {
+  border-radius: 3px;
+  background: var(--surface-well);
+  border: 1px solid var(--line-strong);
+  font-family: "JetBrains Mono", Consolas, monospace;
+  letter-spacing: 0.05em;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.45), 0 1px 0 var(--specular-top);
+}
+
+:root[data-style="darkroom"] .counter {
+  color: var(--accent);
+  border-color: var(--accent-border);
+  text-shadow: 0 0 8px var(--accent-glow);
+}
+
+/* Anodized Aluminum Loupe Modules (Items) with Glowing Optical Rail */
+:root[data-style="darkroom"] .item {
+  position: relative;
+  border-radius: 5px;
+  border: 1px solid var(--line-strong);
+  border-left: 3px solid var(--line-strong);
+  background:
+    linear-gradient(165deg, color-mix(in srgb, var(--raised) 55%, var(--panel)) 0%, var(--panel) 55%, color-mix(in srgb, var(--surface-well) 35%, var(--panel)) 100%);
+  box-shadow:
+    inset 0 1px 0 var(--specular-top),
+    inset 0 0 0 1px var(--bezel-inner),
+    0 10px 24px -8px rgba(0, 0, 0, 0.55);
+}
+
+/* Corner reticle bracket accent on each module */
+:root[data-style="darkroom"] .item::after {
+  content: "";
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 10px;
+  height: 10px;
+  border-top: 1.5px solid var(--line-strong);
+  border-right: 1.5px solid var(--line-strong);
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+:root[data-style="darkroom"] .item:hover {
+  border-color: var(--accent-border);
+  border-left: 3px solid var(--accent);
+  box-shadow:
+    inset 0 1px 0 var(--accent-border),
+    0 0 20px -4px var(--accent-glow),
+    0 12px 28px -8px rgba(0, 0, 0, 0.65);
+}
+
+:root[data-style="darkroom"] .item.active {
+  border-color: var(--accent);
+  border-left: 3px solid var(--accent);
+  background:
+    linear-gradient(165deg, color-mix(in srgb, var(--accent) 12%, var(--raised)) 0%, var(--panel) 65%);
+  box-shadow:
+    inset 0 1px 0 var(--accent),
+    0 0 26px -4px var(--accent-glow),
+    0 14px 32px -8px rgba(0, 0, 0, 0.7);
+}
+
+/* Recessed Optical Lens Well Icon */
+:root[data-style="darkroom"] .item-icon {
+  border-radius: 50%;
+  background: radial-gradient(circle at 32% 28%, var(--raised), var(--surface-well) 72%);
+  border: 1.5px solid var(--line-strong);
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.55),
+    0 0 0 2px var(--bezel-inner);
+}
+
+:root[data-style="darkroom"] .item-icon.pipeline,
+:root[data-style="darkroom"] .item.active .item-icon {
+  background: radial-gradient(circle at 32% 28%, var(--accent-soft), var(--surface-well) 75%);
+  border-color: var(--accent);
+  color: var(--accent);
+  box-shadow:
+    inset 0 0 8px var(--accent-glow),
+    0 0 10px var(--accent-glow);
+}
+
+/* OLED Camera Viewfinder Readouts for Item Details */
+:root[data-style="darkroom"] .item-details {
+  gap: 6px;
+}
+
+:root[data-style="darkroom"] .item-details > span {
+  font-family: "JetBrains Mono", Consolas, monospace;
+  font-size: 10.5px;
+  padding: 2px 8px;
+  border-radius: 3px;
+  background: var(--surface-well);
+  border: 1px solid var(--line);
+  color: var(--text-secondary);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+/* Micro-textured Recessed Control Tray */
+:root[data-style="darkroom"] .item-tools {
+  border-top: 1px solid var(--line-strong);
+  background-color: var(--bg-subtle);
+  background-image: radial-gradient(var(--line) 0.75px, transparent 0.75px);
+  background-size: 4px 4px;
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.28);
+}
+
+:root[data-style="darkroom"] .item-expanded {
+  border-top: 1px solid var(--line-strong);
+  background: var(--bg-subtle);
+  box-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.35);
+}
+
+/* 35mm Film Strip Contact Sheet (胶片齿孔底片夹) */
+:root[data-style="darkroom"] .file-card {
+  position: relative;
+  border-radius: 4px;
+  padding: 6px 14px;
+  background-color: var(--surface-well);
+  /* 35mm film sprocket perforations along left and right edges */
+  background-image:
+    repeating-linear-gradient(
+      180deg,
+      transparent 0 4px,
+      var(--film-hole) 4px 9px,
+      transparent 9px 14px
+    ),
+    repeating-linear-gradient(
+      180deg,
+      transparent 0 4px,
+      var(--film-hole) 4px 9px,
+      transparent 9px 14px
+    );
+  background-size: 5px 100%, 5px 100%;
+  background-position: 4px 0, calc(100% - 4px) 0;
+  background-repeat: no-repeat;
+  border: 1px solid var(--line-strong);
+  box-shadow: inset 0 1px 0 var(--specular-top), 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+:root[data-style="darkroom"] .file-thumbnail {
+  border-radius: 2px;
+  border: 1px solid var(--line-strong);
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.5);
+}
+
+:root[data-style="darkroom"] .file-caption {
+  border-top: 0;
+  background: transparent;
+  padding: 7px 2px 2px;
+  font-family: "JetBrains Mono", Consolas, monospace;
+}
+
+/* Hardware Buttons & Recessed Wells */
+:root[data-style="darkroom"] :where(.home, .editor-sidebar, .node-popup, .script-editor) :is(input:not([type="range"]):not([type="checkbox"]), select, textarea) {
+  border-radius: 4px;
+  background: var(--surface-well);
+  border: 1px solid var(--line-strong);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.45), 0 1px 0 var(--specular-top);
+}
+
+:root[data-style="darkroom"] :where(.home, .editor-sidebar, .node-popup, .script-editor) .button {
+  border-radius: 4px;
+  background: linear-gradient(180deg, var(--raised) 0%, var(--panel) 100%);
+  border: 1px solid var(--line-strong);
+  box-shadow: inset 0 1px 0 var(--specular-top), 0 2px 5px rgba(0, 0, 0, 0.35);
+}
+
+:root[data-style="darkroom"] :where(.home, .editor-sidebar, .node-popup, .script-editor) .button:hover:not(:disabled) {
+  border-color: var(--accent-border);
+  box-shadow: inset 0 1px 0 var(--specular-top), 0 0 12px var(--accent-glow);
+}
+
+:root[data-style="darkroom"] :where(.home, .editor-sidebar, .node-popup, .script-editor) .button.primary {
+  background: linear-gradient(180deg, color-mix(in srgb, white 16%, var(--accent)) 0%, var(--accent) 100%);
+  border-color: color-mix(in srgb, white 30%, var(--accent));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 0 16px var(--accent-glow);
+}
+
+/* Segmented LED VU-Meter Progress Bar */
+:root[data-style="darkroom"] .progress-track,
+:root[data-style="darkroom"] .trial-progress {
+  height: 7px;
+  border-radius: 2px;
+  padding: 1px;
+  background: var(--surface-well);
+  border: 1px solid var(--line-strong);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.6);
+}
+
+:root[data-style="darkroom"] .progress-fill {
+  border-radius: 1px;
+  background-color: var(--accent);
+  background-image: repeating-linear-gradient(
+    90deg,
+    transparent 0 6px,
+    rgba(0, 0, 0, 0.45) 6px 8px
+  );
+  box-shadow: 0 0 12px var(--accent), 0 0 4px var(--accent-contrast);
+}
+
+:root[data-style="darkroom"] .empty {
+  border-radius: 5px;
+  border: 1px dashed var(--line-strong);
+  background:
+    radial-gradient(circle at center, var(--accent-soft), var(--surface-well) 75%);
+  box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.45);
+}
+
+/* Optical Console Sidebar & Viewfinder Loupe Preview */
+:root[data-style="darkroom"] .editor-sidebar {
+  background:
+    linear-gradient(180deg, var(--panel) 0%, var(--bg-subtle) 100%);
+  border-left: 1px solid var(--line-strong);
+  box-shadow: inset 1px 0 0 var(--specular-top);
+}
+
+:root[data-style="darkroom"] .sidebar-section {
+  background: color-mix(in srgb, var(--surface-well) 40%, var(--panel));
+  border: 1px solid var(--line-strong);
+  border-radius: 5px;
+  padding: 12px;
+  margin-bottom: 14px;
+  box-shadow: inset 0 1px 0 var(--specular-top), 0 6px 16px -6px rgba(0, 0, 0, 0.45);
+}
+
+:root[data-style="darkroom"] .sidebar-section:last-child {
+  border: 1px solid var(--line-strong);
+  margin-bottom: 0;
+}
+
+:root[data-style="darkroom"] .sidebar-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-family: "JetBrains Mono", Consolas, monospace;
+  color: var(--accent);
+  text-shadow: 0 0 8px var(--accent-glow);
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 7px;
+  margin-bottom: 10px;
+}
+
+:root[data-style="darkroom"] .sidebar-title::before {
+  content: "⌖";
+  font-size: 13px;
+}
+
+:root[data-style="darkroom"] .preview-surface,
+:root[data-style="darkroom"] .popup-preview {
+  border-radius: 4px;
+  border: 1.5px solid var(--line-strong);
+  box-shadow:
+    inset 0 2px 12px rgba(0, 0, 0, 0.65),
+    0 0 0 1px var(--bezel-inner);
+}
+
+/* Viewfinder Corner L-Brackets + Center Crosshair & Bottom Scale Ticks */
+:root[data-style="darkroom"] .preview-surface::after,
+:root[data-style="darkroom"] .popup-preview::after {
+  content: '';
+  position: absolute;
+  inset: 7px;
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0.78;
+  background:
+    linear-gradient(to right, var(--accent) 2px, transparent 2px) 0 0,
+    linear-gradient(to bottom, var(--accent) 2px, transparent 2px) 0 0,
+    linear-gradient(to left, var(--accent) 2px, transparent 2px) 100% 0,
+    linear-gradient(to bottom, var(--accent) 2px, transparent 2px) 100% 0,
+    linear-gradient(to right, var(--accent) 2px, transparent 2px) 0 100%,
+    linear-gradient(to top, var(--accent) 2px, transparent 2px) 0 100%,
+    linear-gradient(to left, var(--accent) 2px, transparent 2px) 100% 100%,
+    linear-gradient(to top, var(--accent) 2px, transparent 2px) 100% 100%,
+    repeating-linear-gradient(90deg, var(--accent) 0 1px, transparent 1px 8px) 50% 100%;
+  background-size:
+    13px 13px, 13px 13px,
+    13px 13px, 13px 13px,
+    13px 13px, 13px 13px,
+    13px 13px, 13px 13px,
+    81px 4px;
+  background-repeat: no-repeat;
+}
+
+:root[data-style="darkroom"] .node-popup,
+:root[data-style="darkroom"] .script-editor,
+:root[data-style="darkroom"] .context-menu,
+:root[data-style="darkroom"] .toast {
+  border-radius: 6px;
+  border: 1px solid var(--line-strong);
+  box-shadow:
+    inset 0 1px 0 var(--specular-top),
+    0 0 28px -6px var(--accent-glow),
+    var(--shadow-lg);
+}
+

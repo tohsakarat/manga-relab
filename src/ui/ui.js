@@ -170,6 +170,12 @@ const UI = (() => {
 
   const THEME_KEY = 'screenlab-theme-v1';
   const themeListeners = new Set();
+  const styles = [
+    ['manuscript', 'PenTool', '漫画原稿工坊风'],
+    ['editorial', 'BookOpen', '现代画册目录风'],
+    ['darkroom', 'Aperture', '光学暗房看片台风'],
+    ['card', 'LayoutGrid', '经典圆角卡片风'],
+  ];
   const accents = [
     ['blue', '科技蓝'],
     ['pink', '樱花粉'],
@@ -182,9 +188,10 @@ const UI = (() => {
       return {
         theme: saved?.theme === 'light' ? 'light' : 'dark',
         accent: ['blue', 'pink', 'green'].includes(saved?.accent) ? saved.accent : 'blue',
+        style: styles.some(([key]) => key === saved?.style) ? saved.style : 'manuscript',
       };
     } catch {
-      return { theme: 'dark', accent: 'blue' };
+      return { theme: 'dark', accent: 'blue', style: 'manuscript' };
     }
   }
 
@@ -194,6 +201,7 @@ const UI = (() => {
     appearance = { ...appearance, ...next };
     document.documentElement.dataset.theme = appearance.theme;
     document.documentElement.dataset.accent = appearance.accent;
+    document.documentElement.dataset.style = appearance.style;
     try { localStorage.setItem(THEME_KEY, JSON.stringify(appearance)); } catch {}
     renderThemeControls();
     for (const listener of themeListeners) listener(appearance);
@@ -208,6 +216,19 @@ const UI = (() => {
     const host = document.getElementById('theme-controls');
     if (!host) return;
     host.replaceChildren();
+    const styleGroup = el('div', 'style-switcher');
+    styleGroup.setAttribute('role', 'group');
+    styleGroup.setAttribute('aria-label', '界面风格');
+    for (const [key, iconName, fullTitle] of styles) {
+      const btn = el('button', `style-option style-${key}${appearance.style === key ? ' active' : ''}`);
+      btn.type = 'button';
+      btn.title = `切换风格：${fullTitle}`;
+      btn.setAttribute('aria-label', btn.title);
+      btn.setAttribute('aria-pressed', String(appearance.style === key));
+      btn.append(icon(iconName));
+      btn.onclick = () => applyAppearance({ style: key });
+      styleGroup.append(btn);
+    }
     const swatches = el('div', 'accent-switcher');
     for (const [key, labelText] of accents) {
       const swatch = el('button', `accent-swatch accent-${key}${appearance.accent === key ? ' active' : ''}`);
@@ -226,7 +247,7 @@ const UI = (() => {
       isLight ? '日间' : '夜间'
     );
     modeBtn.classList.add('theme-toggle');
-    host.append(swatches, modeBtn);
+    host.append(styleGroup, swatches, modeBtn);
   }
 
   applyAppearance();

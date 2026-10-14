@@ -8,9 +8,9 @@
 
 发布构建需要 Node.js 20.19 或更新版本。`npm ci`、`npm run build`、`npm run watch` 和 `npm run dev` 必须在 Windows 侧 PowerShell 中运行，不要从 WSL 执行，避免共用 `node_modules` 后 esbuild 平台二进制不匹配。先运行 `npm ci`，再运行 `npm run build`。`scripts/build.mjs` 根据 `index.html` 的脚本及样式顺序生成 `dist/`：第三方脚本与应用脚本分别合并，普通 JS 由 Terser 压缩及优化但关闭变量名混淆，CSS 由 esbuild 合并压缩；脚本使用 defer，资源名包含内容哈希，第三方许可证保留。`src/filters/` 与 `src/core/gpu-batches.js` 保留原始源码，不能按普通 JS 压缩：滤镜注册通过函数源码解析参数表并生成可独立编辑及执行的 Worker 脚本。构建会重新生成 `dist/`，不修改源文件。发布版可用 `python3 -m http.server 8765 --bind 0.0.0.0 --directory dist` 启动。
 
-持续调试使用 `npm run dev` 或等价的 `npm run watch`：只构建和监听，不启动开发服务；首次构建完成后直接打开项目根目录的 `index.html`。命令监听 `index.html`、`src/`、`styles/`、`vendor/`、`scripts/` 的新增、修改和删除并重新构建，包含预装流水线 JSON；构建完成后手动刷新浏览器。监听复用现有发布构建，构建失败显示错误并等待下一次修改；连续修改合并，构建串行执行。WSL Windows 挂载盘使用轮询。Ctrl+C 停止监听。
+持续调试使用 `npm run dev` 或等价的 `npm run watch`：构建和监听完成后在 `http://localhost:8765` 提供 `dist/`，并打印调试地址。命令监听 `index.html`、`src/`、`styles/`、`vendor/`、`scripts/` 的新增、修改和删除并重新构建，包含预装流水线 JSON；构建完成后手动刷新浏览器。监听复用现有发布构建，构建失败显示错误并等待下一次修改；连续修改合并，构建串行执行。WSL Windows 挂载盘使用轮询。Ctrl+C 停止监听。
 
-监听就绪后，终端打印项目根目录 `index.html` 的完整 `file:///` 调试地址，以及刷新页面和 Ctrl+C 停止监听的提示；`watch` 与 `dev` 共用此输出。
+监听就绪后，终端打印 `http://localhost:8765`，以及刷新页面和 Ctrl+C 停止监听的提示；`watch` 与 `dev` 共用此输出。
 
 ## 操作
 

@@ -1,9 +1,12 @@
 import { spawn } from 'node:child_process';
+import { createServer } from 'node:http';
 import { resolve } from 'node:path';
-import { fileURLToPath, pathToFileURL } from 'node:url';
+import { fileURLToPath } from 'node:url';
 import chokidar from 'chokidar';
+import sirv from 'sirv';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
+const port = Number(process.env.PORT || 8765);
 
 export async function startWatcher() {
   let child, timer, building = false, pending = false;
@@ -53,13 +56,25 @@ export async function startWatcher() {
   });
   await new Promise(resolve => watcher.once('ready', resolve));
   console.log('[watch] Watching source files.');
-  console.log(`[watch] Debug page: ${pathToFileURL(resolve(root, 'index.html')).href}`);
+  const serve = sirv(resolve(root, 'dist'), { dev: true });
+  const server = createServer((request, response) => {
+    serve(request, response, () => {
+      response.writeHead(404);
+      response.end('Not found');
+    });
+  });
+  await new Promise((resolve, reject) => {
+    server.once('error', reject);
+    server.listen(port, '0.0.0.0', resolve);
+  });
+  console.log(`[watch] Debug page: http://localhost:${port}`);
   console.log('[watch] Refresh the browser after changes. Press Ctrl+C to stop.');
 
   return async function stop() {
     clearTimeout(timer);
     pending = false;
     child?.kill();
+    await new Promise(resolve => server.close(resolve));
     await watcher.close();
   };
 }
