@@ -87,8 +87,6 @@ python -m http.server 8765 --directory dist
 
 构建按 `index.html` 的加载顺序合并脚本，将第三方库和应用分别打包，合并并压缩 CSS；JS 做常规压缩和表达式优化，关闭变量名混淆。两个脚本使用 `defer` 加载，资源文件名包含内容哈希，更新后使用新地址。滤镜及 GPU 批次辅助函数保留原始源码，因为参数表解析、Worker 执行和“编辑脚本”依赖函数源码。预装流水线自动扫描 `src/pipelines/` 下全部 `.json` 并内置到应用脚本。第三方许可证随产物保留。构建不改动源文件，每次重新生成 `dist/`；源码直接运行仍不需要安装依赖。
 
-Cloudflare Pages 的发布配置与手动部署命令见 [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md)。正式部署需先由项目负责人确认。
-
 ### 持续调试
 
 ```bash
