@@ -1,10 +1,10 @@
 /* The same DAG scheduler serves full-image tasks and viewport previews. */
 'use strict';
 const Engine = (() => {
-  async function runNode(graph, n, images, { values = {}, onProgress = () => {}, signal, roi } = {}) {
+  async function runNode(graph, n, images, { values = {}, onProgress = () => {}, signal, roi, prepareOutput } = {}) {
     if (signal?.aborted) throw new DOMException('Cancelled', 'AbortError');
     const parameters = Graph.params(graph, n, values);
-    if (n.type === 'output') return images[0];
+    if (n.type === 'output') return prepareOutput ? prepareOutput(n, images[0]) : images[0];
     const input = Graph.multipleImages(n) ? images : images[0];
     const job = ScreenFilters.start(Graph.filterId(n), input, parameters, { roi, progress: v => onProgress(n, v) });
     const cancel = () => job.cancel(); signal?.addEventListener('abort', cancel, { once: true });
@@ -16,7 +16,7 @@ const Engine = (() => {
       originX: reference.originX, originY: reference.originY, ...output };
     return output;
   }
-  async function execute(graph, source, { values = {}, target, targets, cache = new Map(), onNode = () => {}, onProgress = () => {}, signal } = {}) {
+  async function execute(graph, source, { values = {}, target, targets, cache = new Map(), onNode = () => {}, onProgress = () => {}, signal, prepareOutput } = {}) {
     const validation = Graph.validate(graph, targets || (target ? [target] : undefined));
     if (!validation.valid) throw new Error(validation.errors.join('；'));
     for (const id of Graph.order(graph, validation.active)) {
@@ -26,7 +26,7 @@ const Engine = (() => {
       onProgress(n, 0);
       const edges = Graph.imageEdges(graph, n);
       const images = edges.map(e => cache.get(e.from.nodeId));
-      const output = n.type === 'input' ? source : await runNode(graph, n, images, { values, onProgress, signal });
+      const output = n.type === 'input' ? source : await runNode(graph, n, images, { values, onProgress, signal, prepareOutput });
       if (signal?.aborted) throw new DOMException('Cancelled', 'AbortError');
       cache.set(id, output); onProgress(n, 1); await onNode(n, output);
     }

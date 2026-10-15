@@ -30,7 +30,11 @@
           "colorMode": "indexed",
           "format": "png",
           "quality": 95,
-          "indexBits": 4
+          "indexBits": 3,
+          "conflictMode": "overwrite",
+          "dither": "pattern",
+          "ditherAmount": 100,
+          "preserveExactColors": true
         }
       },
       "58e753a3-5cc1-40b0-9e5f-1c28cc409431": {
@@ -131,8 +135,8 @@
         "id": "905083dd-408b-46aa-939a-b694661f91c9",
         "type": "output",
         "name": "输出高清",
-        "x": 1988.0725963018265,
-        "y": 931.5646058697471,
+        "x": 1520.77931593322,
+        "y": 843.0427036258376,
         "params": {
           "directory": {
             "key": "pipeline:0a5d3e94-c5d2-49c1-bca8-c7e4d4d91bc5:905083dd-408b-46aa-939a-b694661f91c9",
@@ -145,7 +149,11 @@
           "colorMode": "indexed",
           "format": "png",
           "quality": 95,
-          "indexBits": 2
+          "indexBits": 4,
+          "conflictMode": "overwrite",
+          "dither": "pattern",
+          "ditherAmount": 100,
+          "preserveExactColors": true
         }
       }
     },
@@ -496,25 +504,6 @@
         }
       },
       {
-        "variableId": "b1bb2d8a-2f34-465d-81cd-b62f23a7a6c4",
-        "sourceNodeId": "0c54d63b-79f6-46ef-ba79-22dd49dc4941",
-        "paramKey": "directory",
-        "displayName": "输出低清.输出目录",
-        "defaultValue": {
-          "key": "pipeline:0a5d3e94-c5d2-49c1-bca8-c7e4d4d91bc5:0c54d63b-79f6-46ef-ba79-22dd49dc4941",
-          "name": ""
-        },
-        "spec": {
-          "key": "directory",
-          "label": "输出目录",
-          "type": "directory",
-          "default": {
-            "key": "",
-            "name": ""
-          }
-        }
-      },
-      {
         "variableId": "0b4ac405-7ee3-4541-8cdf-4df6b1ad7092",
         "sourceNodeId": "93bf7e49-a4a7-4bfd-9010-d3f72243e820",
         "paramKey": "size",
@@ -541,6 +530,25 @@
         }
       },
       {
+        "variableId": "b1bb2d8a-2f34-465d-81cd-b62f23a7a6c4",
+        "sourceNodeId": "0c54d63b-79f6-46ef-ba79-22dd49dc4941",
+        "paramKey": "directory",
+        "displayName": "输出低清.输出目录",
+        "defaultValue": {
+          "key": "pipeline:0a5d3e94-c5d2-49c1-bca8-c7e4d4d91bc5:0c54d63b-79f6-46ef-ba79-22dd49dc4941",
+          "name": ""
+        },
+        "spec": {
+          "key": "directory",
+          "label": "输出目录",
+          "type": "directory",
+          "default": {
+            "key": "",
+            "name": ""
+          }
+        }
+      },
+      {
         "variableId": "7d96a6bf-4636-46e2-89d4-3dbb71e87e99",
         "sourceNodeId": "905083dd-408b-46aa-939a-b694661f91c9",
         "paramKey": "directory",
@@ -561,9 +569,9 @@
       }
     ],
     "view": {
-      "x": 729.1627418960738,
-      "y": 6.3442038194754105,
-      "zoom": 0.8630678035982761
+      "x": -992.0443722265575,
+      "y": -1252.4692863886887,
+      "zoom": 1.044312042353914
     }
   }
 }

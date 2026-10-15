@@ -30,7 +30,11 @@
           "colorMode": "indexed",
           "format": "png",
           "quality": 95,
-          "indexBits": 4
+          "indexBits": 4,
+          "conflictMode": "overwrite",
+          "dither": "pattern",
+          "ditherAmount": 100,
+          "preserveExactColors": true
         }
       },
       "58e753a3-5cc1-40b0-9e5f-1c28cc409431": {
@@ -41,7 +45,7 @@
         "y": 142.21970020583925,
         "params": {
           "patch": 4,
-          "search": 12,
+          "search": 16,
           "strength": 25
         }
       },
@@ -145,7 +149,11 @@
           "colorMode": "indexed",
           "format": "png",
           "quality": 95,
-          "indexBits": 2
+          "indexBits": 2,
+          "conflictMode": "overwrite",
+          "dither": "pattern",
+          "ditherAmount": 100,
+          "preserveExactColors": true
         }
       }
     },
@@ -347,6 +355,28 @@
           "nodeId": "905083dd-408b-46aa-939a-b694661f91c9",
           "port": "directory"
         }
+      },
+      {
+        "id": "ff48958c-8340-45a8-a934-6db9b9b61642",
+        "from": {
+          "nodeId": "14263940-a7ee-4033-8abd-7340195e9bf3",
+          "port": "1b6684b7-d1b3-4cca-9fee-db3827ec9c6f"
+        },
+        "to": {
+          "nodeId": "5ffc2865-f6bc-406a-8b98-44093dc719dc",
+          "port": "radius"
+        }
+      },
+      {
+        "id": "f2174fe2-7a7c-4794-9043-2b6f36e913c6",
+        "from": {
+          "nodeId": "14263940-a7ee-4033-8abd-7340195e9bf3",
+          "port": "ccf79e9a-c684-4d93-9538-7bbfb20b3e47"
+        },
+        "to": {
+          "nodeId": "5ffc2865-f6bc-406a-8b98-44093dc719dc",
+          "port": "threshold"
+        }
       }
     ],
     "exposedVars": [
@@ -371,7 +401,7 @@
         "sourceNodeId": "58e753a3-5cc1-40b0-9e5f-1c28cc409431",
         "paramKey": "search",
         "displayName": "降噪.搜索半径",
-        "defaultValue": 12,
+        "defaultValue": 16,
         "spec": {
           "key": "search",
           "label": "搜索半径",
@@ -396,6 +426,38 @@
           "max": 80,
           "step": 1,
           "default": 25
+        }
+      },
+      {
+        "variableId": "ccf79e9a-c684-4d93-9538-7bbfb20b3e47",
+        "sourceNodeId": "5ffc2865-f6bc-406a-8b98-44093dc719dc",
+        "paramKey": "threshold",
+        "displayName": "表面模糊.阈值（色阶）",
+        "defaultValue": 5,
+        "spec": {
+          "key": "threshold",
+          "label": "阈值（色阶）",
+          "type": "integer",
+          "min": 2,
+          "max": 255,
+          "step": 1,
+          "default": 15
+        }
+      },
+      {
+        "variableId": "1b6684b7-d1b3-4cca-9fee-db3827ec9c6f",
+        "sourceNodeId": "5ffc2865-f6bc-406a-8b98-44093dc719dc",
+        "paramKey": "radius",
+        "displayName": "表面模糊.半径（像素）",
+        "defaultValue": 100,
+        "spec": {
+          "key": "radius",
+          "label": "半径（像素）",
+          "type": "number",
+          "min": 1,
+          "max": 100,
+          "step": 1,
+          "default": 5
         }
       },
       {
@@ -496,25 +558,6 @@
         }
       },
       {
-        "variableId": "b1bb2d8a-2f34-465d-81cd-b62f23a7a6c4",
-        "sourceNodeId": "0c54d63b-79f6-46ef-ba79-22dd49dc4941",
-        "paramKey": "directory",
-        "displayName": "输出低清.输出目录",
-        "defaultValue": {
-          "key": "pipeline:0a5d3e94-c5d2-49c1-bca8-c7e4d4d91bc5:0c54d63b-79f6-46ef-ba79-22dd49dc4941",
-          "name": ""
-        },
-        "spec": {
-          "key": "directory",
-          "label": "输出目录",
-          "type": "directory",
-          "default": {
-            "key": "",
-            "name": ""
-          }
-        }
-      },
-      {
         "variableId": "0b4ac405-7ee3-4541-8cdf-4df6b1ad7092",
         "sourceNodeId": "93bf7e49-a4a7-4bfd-9010-d3f72243e820",
         "paramKey": "size",
@@ -541,6 +584,25 @@
         }
       },
       {
+        "variableId": "b1bb2d8a-2f34-465d-81cd-b62f23a7a6c4",
+        "sourceNodeId": "0c54d63b-79f6-46ef-ba79-22dd49dc4941",
+        "paramKey": "directory",
+        "displayName": "输出低清.输出目录",
+        "defaultValue": {
+          "key": "pipeline:0a5d3e94-c5d2-49c1-bca8-c7e4d4d91bc5:0c54d63b-79f6-46ef-ba79-22dd49dc4941",
+          "name": ""
+        },
+        "spec": {
+          "key": "directory",
+          "label": "输出目录",
+          "type": "directory",
+          "default": {
+            "key": "",
+            "name": ""
+          }
+        }
+      },
+      {
         "variableId": "7d96a6bf-4636-46e2-89d4-3dbb71e87e99",
         "sourceNodeId": "905083dd-408b-46aa-939a-b694661f91c9",
         "paramKey": "directory",
@@ -561,9 +623,9 @@
       }
     ],
     "view": {
-      "x": 443.2514772371598,
-      "y": -92.85355346354379,
-      "zoom": 0.5358972025000072
+      "x": 64.07698111673403,
+      "y": -136.83499825873503,
+      "zoom": 0.5894869227500085
     }
   }
 }

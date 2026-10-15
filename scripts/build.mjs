@@ -105,7 +105,14 @@ const notices = [
   'vendor/upng/LICENSE',
   'vendor/upng/README.md',
 ];
-for (const path of notices) {
+// These classic Worker imports must also resolve in dist/, independently of the page bundles.
+const workerFiles = [
+  'src/io/indexed-color-worker.js',
+  'src/io/output-format.js',
+  'src/core/gpu-batches.js',
+  'vendor/upng/UPNG.js',
+];
+for (const path of [...notices, ...workerFiles]) {
   await mkdir(dirname(join(dist, path)), { recursive: true });
   await cp(join(root, path), join(dist, path));
 }

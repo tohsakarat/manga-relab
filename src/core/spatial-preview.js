@@ -28,7 +28,7 @@ const SpatialPreview = (() => {
     return { x, y, w: Math.ceil((roi.x + roi.w) * size.width / source.width) - x,
       h: Math.ceil((roi.y + roi.h) * size.height / source.height) - y };
   }
-  async function execute(graph, source, { roi, targets, cache, signal, onNode, onProgress, values = {} }) {
+  async function execute(graph, source, { roi, targets, cache, signal, onNode, onProgress, values = {}, prepareOutput }) {
     const validation = Graph.validate(graph, targets);
     if (!validation.valid) throw new Error(validation.errors.join('；'));
     const sizes = Graph.imageSizes(graph, source, validation.active, values), regions = new Map();
@@ -66,7 +66,7 @@ const SpatialPreview = (() => {
           images.push(image);
         }
         onProgress(n, 0);
-        output = await Engine.runNode(graph, n, images, { values, signal, onProgress,
+        output = await Engine.runNode(graph, n, images, { values, signal, onProgress, prepareOutput,
           roi: kind === 'offset' ? rect : undefined });
       }
       if (signal?.aborted) throw new DOMException('Cancelled', 'AbortError');
@@ -84,5 +84,5 @@ const SpatialPreview = (() => {
     }
     return cache;
   }
-  return { execute };
+  return { execute, crop };
 })();

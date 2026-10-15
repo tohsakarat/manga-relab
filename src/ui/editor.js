@@ -7,6 +7,7 @@ const Editor = (() => {
     const graph = pipeline.graph, selected = new Set();
     const events = new AbortController(), nodeElements = new Map(), nodePreviews = new Map();
     const outputEstimates = new Map();
+    const outputPreview = OutputPreview.create(graph);
     let previewFileType = '';
     let gesture = null, draft = null, popup = null, popupNode = null, popupViews = [], scriptEditor = null, space = false;
     let previewTimer = null, previewRun = null, trialRun = null, previewSourceVersion = 0;
@@ -262,8 +263,25 @@ const Editor = (() => {
         edited([n.id]); if (popupNode === n.id) openPanel(n);
       };
       host.append(UI.label('颜色模式', UI.select([['rgb', 'RGB'], ['grayscale', '黑白（灰度）'], ['indexed', '索引颜色']], settings.colorMode, value => change('colorMode', value))));
-      if (settings.colorMode === 'indexed') host.append(UI.label('索引位数', UI.select(
-        [2, 3, 4, 5, 6, 7].map(bits => [String(bits), `${bits} 位 · 最多 ${2 ** bits} 色`]), String(settings.indexBits), value => change('indexBits', Number(value)))));
+      if (settings.colorMode === 'indexed') {
+        host.append(UI.label('索引位数', UI.select(
+          [2, 3, 4, 5, 6, 7].map(bits => [String(bits), `${bits} 位 · 最多 ${2 ** bits} 色`]), String(settings.indexBits), value => change('indexBits', Number(value)))));
+        host.append(UI.label('仿色方式', UI.select(
+          [['none', '无'], ['diffusion', '扩散'], ['pattern', '图案'], ['noise', '杂色']],
+          settings.dither, value => change('dither', value))));
+        if (settings.dither === 'diffusion') {
+          const amount = UI.parameter({ key: 'ditherAmount', label: '仿色数量（%）', type: 'integer', min: 1, max: 100, step: 1 }, settings.ditherAmount, value => {
+            n.outputSettings = { ...Graph.outputSettings(n), ditherAmount: value }; save();
+            for (const control of document.querySelectorAll(`[data-output-dither-amount="${CSS.escape(n.id)}"] input`)) control.value = value;
+            invalidate([n.id]);
+          }, { sliders: true });
+          amount.dataset.outputDitherAmount = n.id;
+          host.append(UI.label('仿色数量（%）', amount));
+          host.append(UI.label('保留精确颜色', UI.parameter(
+            { key: 'preserveExactColors', label: '保留精确颜色', type: 'boolean' },
+            settings.preserveExactColors, value => change('preserveExactColors', value))));
+        }
+      }
       if (n.outputMode !== 'directory') return;
       host.append(UI.label('重名文件', UI.select([['overwrite', '覆盖（默认）'], ['suffix', '给新文件增加后缀']], settings.conflictMode, value => change('conflictMode', value))));
       const compression = UI.select([['png', '无损（PNG）'], ['jpeg', 'JPG'], ['webp', 'WebP']], settings.format, value => change('format', value));
@@ -285,6 +303,13 @@ const Editor = (() => {
       if (node?.type !== 'output') return;
       const label = nodeElements.get(id)?.querySelector('.output-size');
       if (!label) return;
+      const type = node.outputMode === 'overwrite' ? previewFileType : OutputFormat.format(node).type;
+      // PNG previews already contain the final pixels; size estimation would block them with compression.
+      label.hidden = type === 'image/png';
+      if (label.hidden) {
+        outputEstimates.delete(id);
+        return;
+      }
       const context = previewContext();
       const image = (context.image === preview.image ? context.cache.get(id) : null)
         || (canvasPreview.image === preview.image ? canvasPreview.cache.get(id) : null);
@@ -294,14 +319,14 @@ const Editor = (() => {
         label.title = '获得输出预览后估算文件大小';
         return;
       }
-      const type = node.outputMode === 'overwrite' ? previewFileType : OutputFormat.format(node).type;
       const key = JSON.stringify([node.outputMode, Graph.outputSettings(node), type]);
       let estimate = outputEstimates.get(id);
       if (estimate?.image !== image || estimate.key !== key) {
         estimate = { image, key, text: '预估大小：估算中' };
         outputEstimates.set(id, estimate);
         const snapshot = structuredClone(node);
-        OutputFormat.estimateSize(image, snapshot, type).then(bytes => {
+        // Size estimation encodes the displayed colors; never derive a new palette from the crop.
+        OutputFormat.estimateSize(image, snapshot, type, { converted: true }).then(bytes => {
           const unit = bytes >= 1048576 ? 'MB' : 'KB', divisor = unit === 'MB' ? 1048576 : 1024;
           estimate.text = `预估大小：约 ${(bytes / divisor).toFixed(1)} ${unit}`;
         }).catch(error => {
@@ -605,7 +630,8 @@ const Editor = (() => {
       scriptEditor?.destroy(); scriptEditor = null;
       clearTimeout(previewTimer); previewRun?.abort(); previewNode = null;
       if (popup) for (const surface of popup.querySelectorAll('.popup-preview')) resize.unobserve(surface);
-      for (const v of popupViews) v.destroy(); popupViews = []; popup?.remove(); popup = null; popupNode = null;
+      for (const v of popupViews) v.destroy(); popupViews = [];
+      popup?.closest('.node-popup-layer')?.remove(); popup?.remove(); popup = null; popupNode = null;
       for (const { handle } of nodePreviews.values()) handle.freeze(false);
       previewError = '';
     }
@@ -648,10 +674,21 @@ const Editor = (() => {
       } else for (const spec of Graph.specs(n)) parameterPanel(n, spec, parameters);
       if (Graph.multipleImages(n)) imageInputControls(n, parameters);
       if (n.type === 'custom') openScriptPanel(n);
-      else document.body.append(popup);
+      else {
+        // A sibling of the transformed node host stays centered in the visible canvas.
+        const layer = UI.el('div', 'node-popup-layer');
+        layer.onpointerdown = layer.onwheel = event => event.stopPropagation();
+        layer.oncontextmenu = event => {
+          event.stopPropagation();
+          if (event.target === layer) event.preventDefault();
+        };
+        layer.onclick = event => { if (event.target === layer) closePanel(); };
+        layer.append(popup); root.append(layer);
+      }
       preview.refresh(); syncPreviewRegion(); paintPreviews(); schedule(); updatePreviewStatus();
     }
     function openScriptPanel(n) {
+      popup.closest('.node-popup-layer')?.remove();
       popup.className = 'script-node-panel';
       popup.querySelector('.popup-parameters').classList.add('custom-node-parameters');
       popup.querySelector('.popup-body').prepend(popup.querySelector('.popup-previews'));
@@ -740,6 +777,7 @@ const Editor = (() => {
       const affected = new Set();
       for (const id of ids) for (const downstream of Graph.descendants(graph, id)) affected.add(downstream);
       for (const context of [canvasPreview, panelPreview]) for (const id of affected) context.cache.delete(id);
+      outputPreview.invalidate(affected);
       resetPreview(affected);
     }
     function schedule() { clearTimeout(previewTimer); if (trialRun || !preview.image || (!previewState.enabled && !popupNode)) return; previewTimer = setTimeout(calculate, 200); }
@@ -776,7 +814,10 @@ const Editor = (() => {
           const spatial = [...Graph.ancestors(graph, group)].some(id => ['offset', 'composite'].includes(Graph.geometry(graph.nodes[id])));
           const executor = spatial ? SpatialPreview : Engine;
           await executor.execute(graph, spatial ? preview.image : source, { roi: preview.roi, targets: group, cache,
-            signal: controller.signal, ...callbacks });
+            signal: controller.signal, ...callbacks,
+            prepareOutput: (node, patch) => outputPreview.render(node, patch, preview.image, {
+              signal: controller.signal, onProgress: callbacks.onProgress, onYield: () => paintFrame(controller.signal),
+            }) });
         }
         // Cache hits skip onNode, so the panel still needs a final paint.
         if (!controller.signal.aborted) paintPreviews();

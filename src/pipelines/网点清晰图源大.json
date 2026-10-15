@@ -15,12 +15,12 @@
       "0c54d63b-79f6-46ef-ba79-22dd49dc4941": {
         "id": "0c54d63b-79f6-46ef-ba79-22dd49dc4941",
         "type": "output",
-        "name": "输出",
+        "name": "输出-原尺寸",
         "x": 1931.5951550544796,
         "y": 136.8739353698405,
         "params": {
           "directory": {
-            "key": "",
+            "key": "pipeline:71770c0c-1f66-4557-8f99-d2968c5ff8d4:0c54d63b-79f6-46ef-ba79-22dd49dc4941",
             "name": ""
           }
         },
@@ -31,7 +31,10 @@
           "format": "png",
           "quality": 95,
           "indexBits": 2,
-          "conflictMode": "overwrite"
+          "conflictMode": "overwrite",
+          "dither": "pattern",
+          "ditherAmount": 100,
+          "preserveExactColors": true
         }
       },
       "58e753a3-5cc1-40b0-9e5f-1c28cc409431": {
@@ -74,8 +77,8 @@
         "id": "2d30f25a-b4e6-4057-9205-b4d5a0453959",
         "type": "curve",
         "name": "曲线",
-        "x": 1269.282428886698,
-        "y": 182.15274983894642,
+        "x": 1291.900882250349,
+        "y": 207.78706169657863,
         "params": {
           "points": [
             {
@@ -101,8 +104,8 @@
         "id": "87155e17-ac5e-4fcd-b4bc-e2740bb3d750",
         "type": "resize",
         "name": "缩放",
-        "x": 1584.526277088117,
-        "y": 480.4262002267339,
+        "x": 1614.193083264241,
+        "y": 807.9880149525457,
         "params": {
           "size": {
             "unit": "pixels",
@@ -116,12 +119,12 @@
       "8a621a55-90db-480b-ae95-fb7d42f974a8": {
         "id": "8a621a55-90db-480b-ae95-fb7d42f974a8",
         "type": "output",
-        "name": "输出",
-        "x": 1887.0303454581597,
-        "y": 955.434242383906,
+        "name": "输出-压缩",
+        "x": 1969.9649850765866,
+        "y": 1151.4615629784187,
         "params": {
           "directory": {
-            "key": "",
+            "key": "pipeline:71770c0c-1f66-4557-8f99-d2968c5ff8d4:8a621a55-90db-480b-ae95-fb7d42f974a8",
             "name": ""
           }
         },
@@ -132,7 +135,10 @@
           "format": "png",
           "quality": 95,
           "indexBits": 3,
-          "conflictMode": "overwrite"
+          "conflictMode": "overwrite",
+          "dither": "pattern",
+          "ditherAmount": 100,
+          "preserveExactColors": true
         }
       }
     },
@@ -290,6 +296,39 @@
           "nodeId": "8a621a55-90db-480b-ae95-fb7d42f974a8",
           "port": "image"
         }
+      },
+      {
+        "id": "3d5f96c4-9e9d-483c-84be-d72fe9000e02",
+        "from": {
+          "nodeId": "14263940-a7ee-4033-8abd-7340195e9bf3",
+          "port": "83272c68-0494-4fd7-a867-40cb8f84068e"
+        },
+        "to": {
+          "nodeId": "87155e17-ac5e-4fcd-b4bc-e2740bb3d750",
+          "port": "size"
+        }
+      },
+      {
+        "id": "c61fa071-a43f-4343-ad3d-8c3e80846dbe",
+        "from": {
+          "nodeId": "14263940-a7ee-4033-8abd-7340195e9bf3",
+          "port": "8d4a3156-7614-4bd3-b347-1f5be3fbf437"
+        },
+        "to": {
+          "nodeId": "0c54d63b-79f6-46ef-ba79-22dd49dc4941",
+          "port": "directory"
+        }
+      },
+      {
+        "id": "f5517c23-151b-461b-ba5a-5bb0d677f40e",
+        "from": {
+          "nodeId": "14263940-a7ee-4033-8abd-7340195e9bf3",
+          "port": "3eecef35-0594-4cbe-9fec-1e7b57326ac1"
+        },
+        "to": {
+          "nodeId": "8a621a55-90db-480b-ae95-fb7d42f974a8",
+          "port": "directory"
+        }
       }
     ],
     "exposedVars": [
@@ -433,12 +472,76 @@
             }
           ]
         }
+      },
+      {
+        "variableId": "83272c68-0494-4fd7-a867-40cb8f84068e",
+        "sourceNodeId": "87155e17-ac5e-4fcd-b4bc-e2740bb3d750",
+        "paramKey": "size",
+        "displayName": "缩放.尺寸",
+        "defaultValue": {
+          "unit": "pixels",
+          "width": 1600,
+          "height": 1211,
+          "linked": true,
+          "axis": "width"
+        },
+        "spec": {
+          "key": "size",
+          "label": "尺寸",
+          "type": "json",
+          "editor": "resize",
+          "default": {
+            "unit": "percent",
+            "width": 100,
+            "height": 100,
+            "linked": true,
+            "axis": "width"
+          }
+        }
+      },
+      {
+        "variableId": "8d4a3156-7614-4bd3-b347-1f5be3fbf437",
+        "sourceNodeId": "0c54d63b-79f6-46ef-ba79-22dd49dc4941",
+        "paramKey": "directory",
+        "displayName": "输出-原尺寸.输出目录",
+        "defaultValue": {
+          "key": "pipeline:71770c0c-1f66-4557-8f99-d2968c5ff8d4:0c54d63b-79f6-46ef-ba79-22dd49dc4941",
+          "name": ""
+        },
+        "spec": {
+          "key": "directory",
+          "label": "输出目录",
+          "type": "directory",
+          "default": {
+            "key": "",
+            "name": ""
+          }
+        }
+      },
+      {
+        "variableId": "3eecef35-0594-4cbe-9fec-1e7b57326ac1",
+        "sourceNodeId": "8a621a55-90db-480b-ae95-fb7d42f974a8",
+        "paramKey": "directory",
+        "displayName": "输出-压缩.输出目录",
+        "defaultValue": {
+          "key": "pipeline:71770c0c-1f66-4557-8f99-d2968c5ff8d4:8a621a55-90db-480b-ae95-fb7d42f974a8",
+          "name": ""
+        },
+        "spec": {
+          "key": "directory",
+          "label": "输出目录",
+          "type": "directory",
+          "default": {
+            "key": "",
+            "name": ""
+          }
+        }
       }
     ],
     "view": {
-      "x": 197.96584494420722,
-      "y": -16.744269156802375,
-      "zoom": 0.48717927500000124
+      "x": -502.06003134911555,
+      "y": -75.99516009342528,
+      "zoom": 0.4428902500000022
     }
   }
 }

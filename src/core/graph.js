@@ -18,7 +18,10 @@ const Graph = (() => {
     custom: { name: '自定义脚本', icon: 'FileCode2', color: '#b0b5c1' },
   };
   const outputParams = [{ key: 'directory', label: '输出目录', type: 'directory', default: { key: '', name: '' } }];
-  const outputDefaults = { colorMode: 'rgb', format: 'png', quality: 95, indexBits: 7, conflictMode: 'overwrite' };
+  const outputDefaults = {
+    colorMode: 'rgb', format: 'png', quality: 95, indexBits: 7, conflictMode: 'overwrite',
+    dither: 'none', ditherAmount: 100, preserveExactColors: true,
+  };
   function outputSettings(n) {
     // Older pipelines acquire the same defaults without rewriting their stored graph.
     const settings = { ...outputDefaults, ...n.outputSettings };
