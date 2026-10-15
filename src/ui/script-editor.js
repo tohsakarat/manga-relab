@@ -39,7 +39,7 @@ const ScriptEditor = (() => {
       const imported = await file.text();
       const meta = ScreenFilters.metadata(imported);
       info = meta; syncing = true; code.setValue(imported); syncing = false;
-      lastHeader = imported.match(headerPattern)[0]; renderForm(); clearError(); code.focus();
+      lastHeader = imported.match(headerPattern)[0]; renderForm(); clearError(); revealHeader(); code.focus();
     }, '导入 JS'), UI.button('X', '关闭脚本编辑器', onClose));
     toolbar.append(title, actions);
     const body = UI.el('div', 'script-body'), config = UI.el('aside', 'script-config');
@@ -86,7 +86,7 @@ const ScriptEditor = (() => {
     code.on('change', () => {
       if (syncing) return;
       const header = code.getValue().match(headerPattern)?.[0];
-      if (header === lastHeader) return;
+      if (header === lastHeader) { clearError(); return; }
       try {
         const meta = ScreenFilters.metadata(code.getValue()); validateParams(meta.params);
         info = meta; lastHeader = header; renderForm(); clearError();
@@ -97,8 +97,13 @@ const ScriptEditor = (() => {
     dialog.addEventListener('cancel', event => { event.preventDefault(); onClose(); });
     // Canvas shortcuts must not consume code editing or dialog Escape events.
     dialog.addEventListener('keydown', event => event.stopPropagation());
-    renderForm(); dialog.showModal(); code.refresh(); code.focus();
+    renderForm(); dialog.showModal(); code.refresh(); revealHeader(); code.focus();
 
+    function revealHeader() {
+      const match = code.getValue().match(headerPattern);
+      const from = code.posFromIndex(match.index), to = code.posFromIndex(match.index + match[0].length);
+      code.setCursor(from); code.scrollIntoView({ from, to }, 16);
+    }
     function textInput(label) {
       const input = UI.el('input'); input.required = true; input.setAttribute('aria-label', label); return input;
     }
@@ -117,7 +122,6 @@ const ScriptEditor = (() => {
       id.value = info.id; name.value = info.name; renderParameters();
     }
     function syncHeader() {
-      if (!form.checkValidity()) return;
       try {
         validateParams(info.params);
         info.id = id.value.trim(); info.name = name.value.trim();
@@ -125,10 +129,15 @@ const ScriptEditor = (() => {
         const current = code.getValue(), match = current.match(headerPattern);
         const indent = match ? match[0].match(/^[ \t]*/)[0] : '';
         const lines = ['// ==ScreenFilter==', `// @id ${info.id}`, `// @name ${info.name}`];
-        // Preserve the imported cancellation declaration; it does not select hardware.
-        if (info.device) lines.push(`// @device ${info.device}`);
-        if (info.input) lines.push(`// @input ${info.input}`);
-        if (info.geometry) lines.push(`// @geometry ${info.geometry}`);
+        // Only the form's fields are rewritten; retain device, geometry and I/O documentation.
+        if (match) lines.push(...match[0].split('\n').slice(1, -1)
+          .filter(line => !/^[ \t]*\/\/[ \t]+@(id|name|param)\b/.test(line))
+          .map(line => line.trimStart()));
+        else {
+          if (info.device) lines.push(`// @device ${info.device}`);
+          if (info.input) lines.push(`// @input ${info.input}`);
+          if (info.geometry) lines.push(`// @geometry ${info.geometry}`);
+        }
         for (const spec of info.params) lines.push(`// @param ${JSON.stringify(spec)}`);
         lines.push('// ==/ScreenFilter==');
         const header = lines.map(line => indent + line).join('\n');
@@ -211,7 +220,7 @@ const ScriptEditor = (() => {
               try {
                 spec.default = spec.type === 'json' ? JSON.parse(input.value) : ['number', 'integer'].includes(spec.type) ? input.valueAsNumber : input.value;
                 syncHeader();
-              } catch { input.setCustomValidity('请输入有效 JSON'); }
+              } catch { input.setCustomValidity('请输入有效 JSON'); showError('请输入有效 JSON'); }
             };
           }
           input.setAttribute('aria-label', `${spec.label || spec.key} 默认值`);

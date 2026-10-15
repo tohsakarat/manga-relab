@@ -28,10 +28,16 @@
     return filters[info.id];
   }
   function register(factory, helpers = {}) {
+    const factorySource = factory.toString();
+    const info = metadata(factorySource);
+    const headerPattern = /^[ \t]*\/\/ ==ScreenFilter==[\s\S]*?\/\/ ==\/ScreenFilter==/m;
+    const header = factorySource.match(headerPattern)[0].replace(/^[ \t]*/gm, '  ');
+    // Keep one header at the factory's start so normal registration and editing share it.
+    const implementation = factorySource.replace(headerPattern, '');
     // Bundle shared helpers into the factory so copied scripts also run on their own.
     const declarations = Object.entries(helpers).map(([name, fn]) => `const ${name} = ${fn.toString()};`).join('\n');
-    const source = declarations ? `function () {\n${declarations}\nreturn (${factory.toString()})();\n}` : factory.toString();
-    return add(metadata(source), `ScreenFilters.register(${source});`, factory());
+    const source = declarations ? `function () {\n${header}\n\n${declarations}\nreturn (${implementation})();\n}` : factorySource;
+    return add(info, `ScreenFilters.register(${source});`, factory());
   }
   function importScript(source, runtimeId) {
     // Imported code executes only in its processing Worker.
