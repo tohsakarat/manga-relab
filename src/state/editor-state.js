@@ -6,8 +6,10 @@ const EditorState = (() => {
   const persist = () => localStorage.setItem(KEY, JSON.stringify(states));
   let database;
   function get(id, previous = {}) {
-    if (!states[id]) {
-      states[id] = { enabled: false, zoom: 1, centerX: .5, centerY: .5, name: '', imageSetId: '', fileId: '', ...previous };
+    if (!states[id] || states[id].canvasPreviewLimit === undefined || states[id].panelPreviewLimit === undefined) {
+      // Fill older editor preferences without moving preview settings into the graph.
+      states[id] = { enabled: false, zoom: 1, centerX: .5, centerY: .5, name: '', imageSetId: '', fileId: '',
+        canvasPreviewLimit: 800, panelPreviewLimit: 1600, ...previous, ...states[id] };
       persist();
     }
     return states[id];

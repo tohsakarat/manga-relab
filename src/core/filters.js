@@ -11,12 +11,18 @@
     },
   };
 
+  function normalizeParameter(spec) {
+    // Older curve declarations selected their UI by key; keep that legacy meaning at import.
+    // An explicit editor (including "default") always wins over the old convention.
+    return spec.type === 'json' && spec.key === 'points' && spec.editor === undefined
+      ? { ...spec, editor: 'curve' } : spec;
+  }
   function metadata(source) {
     const header = source.match(/\/\/ ==ScreenFilter==([\s\S]*?)\/\/ ==\/ScreenFilter==/);
     if (!header) throw new Error('缺少 ScreenFilter 顶部参数表。');
     const info = { params: [] };
     for (const match of header[1].matchAll(/^\s*\/\/ @(id|name|device|input|geometry|param)\s+(.+)$/gm)) {
-      if (match[1] === 'param') info.params.push(JSON.parse(match[2]));
+      if (match[1] === 'param') info.params.push(normalizeParameter(JSON.parse(match[2])));
       else info[match[1]] = match[2].trim();
     }
     if (!info.id || !info.name) throw new Error('滤镜参数表需要 @id 和 @name。');
@@ -87,6 +93,6 @@
       },
     };
   }
-  root.ScreenFilters = { filters, register, importScript, defaults, start, metadata };
+  root.ScreenFilters = { filters, register, importScript, defaults, start, metadata, normalizeParameter };
   if (typeof module !== 'undefined' && module.exports) module.exports = root.ScreenFilters;
 })(globalThis);

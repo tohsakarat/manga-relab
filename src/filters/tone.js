@@ -2,7 +2,7 @@ ScreenFilters.register(function () {
   // ==ScreenFilter==
   // @id curve
   // @name 曲线
-  // @param {"key":"points","label":"曲线点","type":"json","range":"array of {x,y}: integer 0..255; x strictly ascending; first x=0, last x=255","default":[{"x":0,"y":0},{"x":255,"y":255}]}
+  // @param {"key":"points","label":"曲线点","type":"json","editor":"curve","range":"array of {x,y}: integer 0..255; x strictly ascending; first x=0, last x=255","default":[{"x":0,"y":0},{"x":255,"y":255}]}
   // @input image {data: Uint8ClampedArray RGBA 0..255, width: integer >=1, height: integer >=1}
   // @option roi {x,y,w,h: integer; x,y>=0; w,h>=1; within image}; default: full image
   // @output {data: Uint8ClampedArray RGBA, width: integer, height: integer}

@@ -290,6 +290,7 @@ const Graph = (() => {
     if (data.format !== 'screenlab-pipeline' || data.version !== 1 || !data.graph?.nodes || !Array.isArray(data.graph.edges) || !Array.isArray(data.graph.exposedVars)) throw new Error('不是支持的流水线 JSON');
     const graph = structuredClone(data.graph);
     delete graph.preview;
+    Store.migrateParameterEditors(graph);
     Store.migrateSurfaceBlur(graph);
     Store.migrateDenoiseBlend(graph);
     for (const n of Object.values(graph.nodes)) {

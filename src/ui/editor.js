@@ -21,7 +21,7 @@ const Editor = (() => {
     const preview = Preview.create(() => {
       EditorState.update(pipeline.id, preview.view()); syncPreviewRegion();
       previewZoom.value = Math.round(preview.view().zoom * 100); updatePreviewStatus();
-    });
+    }, previewState);
     const { canvasZoom, previewZoom, previewStatus, sourceName, sidebarSurface, validationLabel, stats, enabled, trialButton, trialProgress, trialStatus } = buildSidebar();
     preview.attach(sidebarSurface, { primary: true });
 
@@ -111,7 +111,14 @@ const Editor = (() => {
       const sourceRow = UI.el('div', 'preview-meta-row');
       const check = UI.el('label', 'check-row'), enabled = UI.el('input'); enabled.type = 'checkbox'; enabled.checked = previewState.enabled;
       check.append(enabled, document.createTextNode('编辑器预览'));
-      imageChoices.append(selectRow); sourceRow.append(sourceName);
+      const limits = UI.el('div', 'field-grid');
+      for (const [key, label] of [['canvasPreviewLimit', '普通预览上限（px）'], ['panelPreviewLimit', '浮窗预览上限（px）']]) {
+        limits.append(UI.label(label, UI.parameter({ key, label, type: 'integer', min: 1, step: 1 }, previewState[key], value => {
+          EditorState.update(pipeline.id, { [key]: value });
+          preview.refresh(); updatePreviewStatus(); paintPreviews();
+        })));
+      }
+      imageChoices.prepend(limits); imageChoices.append(selectRow); sourceRow.append(sourceName);
       image.append(check, imageChoices, sourceRow);
       const trialButton = UI.button('Play', '整图试跑并下载结果', trial, '试跑'); trialButton.classList.add('primary', 'trial-button');
       const trialProgress = UI.el('progress', 'trial-progress'); trialProgress.max = 100; trialProgress.value = 0; trialProgress.hidden = true; trialProgress.setAttribute('aria-label', '试跑总进度');

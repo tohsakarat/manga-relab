@@ -102,8 +102,24 @@ const UI = (() => {
     canvas.getContext('2d').putImageData(new ImageData(image.data, image.width, image.height), 0, 0);
   }
   const enums = { center: '中', left: '左', right: '右', top: '上', bottom: '下', unspecified: '不指定' };
+  // Editors describe value controls; parameter types still govern data and port compatibility.
+  const parameterEditors = {
+    curve: {
+      type: 'json', label: '曲线',
+      create(value, onChange) {
+        const host = el('div', 'parameter-control curve-control');
+        ScreenCurve.create(host, { initialPoints: value, onChange });
+        return host;
+      },
+    },
+    resize: {
+      type: 'json', label: '尺寸',
+      create(value, onChange, { image }) { return ScreenResize.control(value, onChange, image); },
+    },
+  };
   function parameter(spec, value, onChange, { sliders = false, params = {}, image } = {}) {
-    if (spec.type === 'json' && spec.editor === 'resize') return ScreenResize.control(value, onChange, image);
+    const editor = parameterEditors[spec.editor];
+    if (editor?.type === spec.type) return editor.create(value, onChange, { image });
     if (spec.integerWhen && params[spec.integerWhen.key] === spec.integerWhen.value) {
       spec = { ...spec, min: Math.ceil(spec.min), step: 1 };
     }
@@ -120,10 +136,6 @@ const UI = (() => {
         picker.replaceChildren(icon('FolderOpen'), el('span', '', handle?.name || (value.name ? `${value.name} · 重新授权` : '选择目录')));
       }
       update(); host.append(picker); return host;
-    }
-    if (spec.key === 'points' && spec.type === 'json') {
-      host.classList.add('curve-control');
-      ScreenCurve.create(host, { initialPoints: value, onChange }); return host;
     }
     let input;
     if (spec.type === 'enum') {
@@ -252,5 +264,5 @@ const UI = (() => {
 
   applyAppearance();
 
-  return { el, icon, button, run, toast, download, pickFiles, rename, select, label, splitColumns, paint, parameter, menu, closeMenu, applyAppearance, onThemeChange, get appearance() { return appearance; } };
+  return { el, icon, button, run, toast, download, pickFiles, rename, select, label, splitColumns, paint, parameter, parameterEditors, menu, closeMenu, applyAppearance, onThemeChange, get appearance() { return appearance; } };
 })();

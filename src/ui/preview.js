@@ -1,10 +1,11 @@
 /* Shared image viewport, independent of the node-canvas zoom. Keeps previews local. */
 'use strict';
 const Preview = (() => {
-  function create(onViewChange) {
+  function create(onViewChange, settings) {
     let image = null, scale = 1, centerX = 0, centerY = 0, roi = null, viewVersion = 0;
     const surfaces = new Set(), original = document.createElement('canvas');
-    function limit() { return [...surfaces].some(s => !s.primary && !s.node) ? 1600 : 800; }
+    // Read the live editor preferences so changing a limit can refresh the current crop.
+    function limit() { return [...surfaces].some(s => !s.primary && !s.node) ? settings.panelPreviewLimit : settings.canvasPreviewLimit; }
     function viewport() {
       if (!image) return null;
       // The open panel owns the crop; the sidebar must not enlarge its visible region.

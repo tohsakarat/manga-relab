@@ -13,6 +13,15 @@ const Store = (() => {
   function save(data) { localStorage.setItem(KEY, JSON.stringify(data)); }
 
   function surfaceRadius(value) { return Math.max(1, Math.min(100, Math.round(value))); }
+  function migrateParameterEditors(graph) {
+    let changed = false;
+    for (const variable of graph.exposedVars) {
+      if (!variable.spec) continue;
+      const spec = ScreenFilters.normalizeParameter(variable.spec);
+      if (spec !== variable.spec) { variable.spec = spec; changed = true; }
+    }
+    return changed;
+  }
   function migrateSurfaceBlur(graph) {
     const changed = Object.values(graph.nodes).filter(node => node.type === 'gaussian-blur');
     const filter = ScreenFilters.filters['surface-blur'];
@@ -68,6 +77,7 @@ const Store = (() => {
   let migrated = false;
   // Move older preview preferences out of the saved processing graph once.
   for (const pipeline of Object.values(_data.pipelines)) {
+    if (migrateParameterEditors(pipeline.graph)) migrated = true;
     const denoiseMigration = migrateDenoiseBlend(pipeline.graph);
     if (denoiseMigration.changed) {
       migrated = true;
@@ -179,5 +189,5 @@ const Store = (() => {
     });
   }
 
-  return { uuid, imageSets, pipelines, tasks, tasksUsing, resetTask, persist, migrateSurfaceBlur, migrateDenoiseBlend, isFirstLaunch };
+  return { uuid, imageSets, pipelines, tasks, tasksUsing, resetTask, persist, migrateParameterEditors, migrateSurfaceBlur, migrateDenoiseBlend, isFirstLaunch };
 })();

@@ -161,12 +161,23 @@ const ScriptEditor = (() => {
         }));
         const type = UI.select(types, spec.type, value => {
           spec.type = value;
-          delete spec.min; delete spec.max; delete spec.step; delete spec.values; delete spec.range; delete spec.integerWhen;
+          delete spec.min; delete spec.max; delete spec.step; delete spec.values; delete spec.labels;
+          delete spec.range; delete spec.integerWhen; delete spec.editor;
           spec.default = ['number', 'integer'].includes(value) ? 0 : value === 'boolean' ? false : value === 'json' ? {} : '';
           if (value === 'enum') { spec.values = ['选项1']; spec.default = spec.values[0]; }
+          if (value === 'json') spec.editor = 'default';
           renderParameters(); syncHeader();
         });
         fields.append(UI.label('名称', label), UI.label('类型', type)); row.append(heading, fields);
+        const editors = [['default', '默认'], ...Object.entries(UI.parameterEditors)
+          .filter(([, editor]) => editor.type === spec.type)
+          .map(([key, editor]) => [key, editor.label])];
+        if (spec.editor && !editors.some(([key]) => key === spec.editor)) editors.push([spec.editor, spec.editor]);
+        if (editors.length > 1) {
+          row.append(UI.label('编辑控件', UI.select(editors, spec.editor || 'default', value => {
+            spec.editor = value; syncHeader();
+          })));
+        }
         if (['number', 'integer'].includes(spec.type)) {
           const range = UI.el('div', 'script-range');
           for (const [field, caption] of [['min', '最小值'], ['max', '最大值'], ['step', '步长']]) {
