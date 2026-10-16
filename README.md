@@ -233,6 +233,10 @@ dist/          npm run build 生成的发布文件
 
 遇到 bug 或者有建议，欢迎到 [GitHub Issues](https://github.com/tohsakarat/manga-relab/issues) 提。
 
+## 致谢
+
+感谢 [LINUX DO 论坛](https://linux.do/) 和乐于分享的佬友们。愿这份修图工作流也能给社区添一点用得上的东西。
+
 ## 许可证
 
 本项目使用 [MIT 许可证](LICENSE)。
